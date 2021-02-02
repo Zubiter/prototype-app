@@ -1,0 +1,6 @@
+.sidenav {
+    height: calc(100vh - 56px);
+    overflow: auto;
+    scrollbar-width: thin;
+    top: 56px;
+}
