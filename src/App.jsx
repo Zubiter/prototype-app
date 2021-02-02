@@ -18,8 +18,11 @@ export default function App() {
           <Route path="/create">
             <h1>Create</h1>
           </Route>
-          <Route path="/manage">
-            <h1>Manage</h1>
+          <Route path="/:id/mint">
+            <h1>Mint</h1>
+          </Route>
+          <Route path="/:id/">
+            <h1>Dashboard</h1>
           </Route>
           <Route exact path="/">
             <h1>Home</h1>
@@ -28,7 +31,7 @@ export default function App() {
             <Redirect to="/" />
           </Route>
         </Switch>
-        </Panel>
+      </Panel>
     </Router>
   );
 }

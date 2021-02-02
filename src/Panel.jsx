@@ -10,6 +10,16 @@ import {
   NavDropdown,
 } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+import {
+  BsPlusCircle,
+  BsPuzzle,
+} from 'react-icons/bs';
+import {
+  AiOutlineDollarCircle,
+  AiOutlineDashboard,
+  AiOutlineBarChart,
+  AiOutlineSetting,
+} from 'react-icons/ai';
 
 import './Panel.css';
 
@@ -24,27 +34,31 @@ export default class Panel extends React.Component {
           </LinkContainer>
           <Navbar.Toggle aria-controls="sm-top-navbar" />
           <Navbar.Collapse id="sm-top-navbar">
-            <Nav className="mr-auto d-lg-none">
+            <Nav className="mr-auto d-lg-none" variant="pills">
               <NavDropdown title="Select Collection">
                 <NavDropdown.Item>Collection 1</NavDropdown.Item>
                 <NavDropdown.Divider />
-                <NavDropdown.Item>Create</NavDropdown.Item>
+                <NavDropdown.Item><BsPlusCircle />Create</NavDropdown.Item>
               </NavDropdown>
-              <div class="divider"/>
-              <LinkContainer exact to="/1">
-                <Nav.Link>Dashboard</Nav.Link>
+              <div className="divider"/>
+              <LinkContainer exact to="/1/">
+                <Nav.Link><AiOutlineDashboard />Dashboard</Nav.Link>
               </LinkContainer>
               <LinkContainer to="/1/events">
-                <Nav.Link>Events</Nav.Link>
+                <Nav.Link><AiOutlineBarChart />Events</Nav.Link>
               </LinkContainer>
               <LinkContainer to="/1/mint">
-                <Nav.Link>Mint</Nav.Link>
+                <Nav.Link><AiOutlineDollarCircle />Mint</Nav.Link>
               </LinkContainer>
               <LinkContainer to="/1/setting">
-                <Nav.Link>Setting</Nav.Link>
+                <Nav.Link><AiOutlineSetting />Setting</Nav.Link>
               </LinkContainer>
               <LinkContainer to="/1/extensions">
-                <Nav.Link>Extensions</Nav.Link>
+                <Nav.Link><BsPuzzle />Extensions</Nav.Link>
+              </LinkContainer>
+              <div className="divider" />
+              <LinkContainer to="/1/:extension">
+                <Nav.Link><BsPuzzle />Redeem</Nav.Link>
               </LinkContainer>
             </Nav>
             <Col className="text-lg-right px-0">
@@ -58,27 +72,31 @@ export default class Panel extends React.Component {
               <NavDropdown title="Select Collection">
                 <NavDropdown.Item>Collection 1</NavDropdown.Item>
                 <NavDropdown.Divider />
-                <NavDropdown.Item>Create</NavDropdown.Item>
+                <NavDropdown.Item><BsPlusCircle />Create</NavDropdown.Item>
               </NavDropdown>
-              <div class="divider"/>
-              <LinkContainer exact to="/1">
-                <Nav.Link>Dashboard</Nav.Link>
+              <div className="divider"/>
+              <LinkContainer exact to="/1/">
+                <Nav.Link><AiOutlineDashboard />Dashboard</Nav.Link>
               </LinkContainer>
               <LinkContainer to="/1/events">
-                <Nav.Link>Events</Nav.Link>
+                <Nav.Link><AiOutlineBarChart />Events</Nav.Link>
               </LinkContainer>
               <LinkContainer to="/1/mint">
-                <Nav.Link>Mint</Nav.Link>
+                <Nav.Link><AiOutlineDollarCircle />Mint</Nav.Link>
               </LinkContainer>
               <LinkContainer to="/1/setting">
-                <Nav.Link>Setting</Nav.Link>
+                <Nav.Link><AiOutlineSetting />Setting</Nav.Link>
               </LinkContainer>
               <LinkContainer to="/1/extensions">
-                <Nav.Link>Extensions</Nav.Link>
+                <Nav.Link><BsPuzzle />Extensions</Nav.Link>
+              </LinkContainer>
+              <div className="divider" />
+              <LinkContainer to="/1/extensions/redeem">
+                <Nav.Link><BsPuzzle />Redeem</Nav.Link>
               </LinkContainer>
             </Nav>
           </Col>
-          <Col xs="9" md="10">
+          <Col xs="9" md="10" className="page">
             {this.props.children}
           </Col>
         </Row>

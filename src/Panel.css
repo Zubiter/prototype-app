@@ -9,3 +9,25 @@
     background-color: rgba(128, 128, 128, .4);
     margin: .5rem 0;
 }
+.sidenav .dropdown-menu {
+    width: 100%;
+}
+.dropdown-item, .nav-link {
+    font-weight: 500;
+    color: #666
+}
+.nav-link.active, .dropdown.show .nav-link {
+    background-color: #b1d7ff7c !important;
+    font-weight: 600;
+    color: #0663c5 !important;
+}
+.dropdown-item svg, .nav-link svg {
+    margin-right: .75rem;
+    margin-top: -3px;
+}
+#sm-top-navbar .nav-link {
+    padding-left: .75rem !important;
+}
+.page {
+    padding: .75rem 1.25rem;
+}
