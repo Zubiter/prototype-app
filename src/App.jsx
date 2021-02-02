@@ -3,6 +3,7 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
+  Redirect,
 } from 'react-router-dom';
 
 import Panel from './Panel';
@@ -20,8 +21,11 @@ export default function App() {
           <Route path="/manage">
             <h1>Manage</h1>
           </Route>
+          <Route exact path="/">
+            <h1>Home</h1>
+          </Route>
           <Route path="/">
-            <h1>Hello</h1>
+            <Redirect to="/" />
           </Route>
         </Switch>
         </Panel>
