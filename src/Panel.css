@@ -4,3 +4,8 @@
     scrollbar-width: thin;
     top: 56px;
 }
+.sidenav .divider {
+    height: 1px;
+    background-color: rgba(128, 128, 128, .4);
+    margin: .5rem 0;
+}
