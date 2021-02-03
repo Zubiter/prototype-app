@@ -38,10 +38,12 @@ export default class Panel extends React.Component {
               <NavDropdown title="Select Collection">
                 <NavDropdown.Item>Collection 1</NavDropdown.Item>
                 <NavDropdown.Divider />
-                <NavDropdown.Item><BsPlusCircle />Create</NavDropdown.Item>
+                <LinkContainer to="/create">
+                  <NavDropdown.Item><BsPlusCircle />Create</NavDropdown.Item>
+                </LinkContainer>
               </NavDropdown>
               <div className="divider"/>
-              <LinkContainer exact to="/1/">
+              <LinkContainer to="/1/dashboard">
                 <Nav.Link><AiOutlineDashboard />Dashboard</Nav.Link>
               </LinkContainer>
               <LinkContainer to="/1/events">
@@ -72,10 +74,12 @@ export default class Panel extends React.Component {
               <NavDropdown title="Select Collection">
                 <NavDropdown.Item>Collection 1</NavDropdown.Item>
                 <NavDropdown.Divider />
-                <NavDropdown.Item><BsPlusCircle />Create</NavDropdown.Item>
+                <LinkContainer to="/create">
+                  <NavDropdown.Item><BsPlusCircle />Create</NavDropdown.Item>
+                </LinkContainer>
               </NavDropdown>
               <div className="divider"/>
-              <LinkContainer exact to="/1/">
+              <LinkContainer exact to="/1/dashboard">
                 <Nav.Link><AiOutlineDashboard />Dashboard</Nav.Link>
               </LinkContainer>
               <LinkContainer to="/1/events">
@@ -91,7 +95,7 @@ export default class Panel extends React.Component {
                 <Nav.Link><BsPuzzle />Extensions</Nav.Link>
               </LinkContainer>
               <div className="divider" />
-              <LinkContainer to="/1/extensions/redeem">
+              <LinkContainer to="/1/redeem">
                 <Nav.Link><BsPuzzle />Redeem</Nav.Link>
               </LinkContainer>
             </Nav>

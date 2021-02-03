@@ -7,6 +7,13 @@ import {
 } from 'react-router-dom';
 
 import Panel from './Panel';
+import Create from './Create';
+import Dashboard from './Dashboard';
+import Events from './Events';
+import Mint from './Mint';
+import Setting from './Setting';
+import Extensions from './Extensions';
+import Admin from './Admin';
 
 import './App.css';
 
@@ -16,19 +23,28 @@ export default function App() {
       <Panel>
         <Switch>
           <Route path="/create">
-            <h1>Create</h1>
+            <Create />
+          </Route>
+          <Route path="/:id/dashboard">
+            <Dashboard />
+          </Route>
+          <Route path="/:id/events">
+            <Events />
           </Route>
           <Route path="/:id/mint">
-            <h1>Mint</h1>
+            <Mint />
           </Route>
-          <Route path="/:id/">
-            <h1>Dashboard</h1>
+          <Route path="/:id/setting">
+            <Setting />
           </Route>
-          <Route exact path="/">
-            <h1>Home</h1>
+          <Route path="/:id/extensions">
+            <Extensions />
+          </Route>
+          <Route path="/:id/:extension">
+            <Admin />
           </Route>
           <Route path="/">
-            <Redirect to="/" />
+            <Redirect to="/1/dashboard" />
           </Route>
         </Switch>
       </Panel>
