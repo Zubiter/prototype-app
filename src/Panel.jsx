@@ -13,11 +13,11 @@ import { LinkContainer } from 'react-router-bootstrap';
 import {
   BsPlusCircle,
   BsPuzzle,
+  BsCollection,
 } from 'react-icons/bs';
 import {
   AiOutlineDollarCircle,
   AiOutlineDashboard,
-  AiOutlineBarChart,
   AiOutlineSetting,
 } from 'react-icons/ai';
 
@@ -48,6 +48,9 @@ export default class Panel extends React.Component {
               </LinkContainer>
               <LinkContainer to="/1/mint">
                 <Nav.Link><AiOutlineDollarCircle />Mint</Nav.Link>
+              </LinkContainer>
+              <LinkContainer to="/1/manage-tokens">
+                <Nav.Link><BsCollection />Manage Tokens</Nav.Link>
               </LinkContainer>
               <LinkContainer to="/1/setting">
                 <Nav.Link><AiOutlineSetting />Setting</Nav.Link>
@@ -81,6 +84,9 @@ export default class Panel extends React.Component {
               </LinkContainer>
               <LinkContainer to="/1/mint">
                 <Nav.Link><AiOutlineDollarCircle />Mint</Nav.Link>
+              </LinkContainer>
+              <LinkContainer to="/1/manage-tokens">
+                <Nav.Link><BsCollection />Manage Tokens</Nav.Link>
               </LinkContainer>
               <LinkContainer to="/1/setting">
                 <Nav.Link><AiOutlineSetting />Setting</Nav.Link>

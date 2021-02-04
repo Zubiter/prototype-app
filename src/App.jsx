@@ -10,6 +10,7 @@ import Panel from './Panel';
 import Create from './Create';
 import Dashboard from './Dashboard';
 import Mint from './Mint';
+import ManageTokens from './ManageTokens';
 import Setting from './Setting';
 import Extensions from './Extensions';
 import Admin from './Admin';
@@ -29,6 +30,9 @@ export default function App() {
           </Route>
           <Route path="/:id/mint">
             <Mint />
+          </Route>
+          <Route path="/:id/manage-tokens">
+            <ManageTokens />
           </Route>
           <Route path="/:id/setting">
             <Setting />
