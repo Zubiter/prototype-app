@@ -46,9 +46,6 @@ export default class Panel extends React.Component {
               <LinkContainer to="/1/dashboard">
                 <Nav.Link><AiOutlineDashboard />Dashboard</Nav.Link>
               </LinkContainer>
-              <LinkContainer to="/1/events">
-                <Nav.Link><AiOutlineBarChart />Events</Nav.Link>
-              </LinkContainer>
               <LinkContainer to="/1/mint">
                 <Nav.Link><AiOutlineDollarCircle />Mint</Nav.Link>
               </LinkContainer>
@@ -81,9 +78,6 @@ export default class Panel extends React.Component {
               <div className="divider"/>
               <LinkContainer exact to="/1/dashboard">
                 <Nav.Link><AiOutlineDashboard />Dashboard</Nav.Link>
-              </LinkContainer>
-              <LinkContainer to="/1/events">
-                <Nav.Link><AiOutlineBarChart />Events</Nav.Link>
               </LinkContainer>
               <LinkContainer to="/1/mint">
                 <Nav.Link><AiOutlineDollarCircle />Mint</Nav.Link>

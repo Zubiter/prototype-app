@@ -9,7 +9,6 @@ import {
 import Panel from './Panel';
 import Create from './Create';
 import Dashboard from './Dashboard';
-import Events from './Events';
 import Mint from './Mint';
 import Setting from './Setting';
 import Extensions from './Extensions';
@@ -27,9 +26,6 @@ export default function App() {
           </Route>
           <Route path="/:id/dashboard">
             <Dashboard />
-          </Route>
-          <Route path="/:id/events">
-            <Events />
           </Route>
           <Route path="/:id/mint">
             <Mint />
