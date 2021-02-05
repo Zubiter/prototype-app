@@ -69,7 +69,7 @@ export default class Panel extends React.Component {
           </Navbar.Collapse>
         </Navbar>
         <Row>
-          <Col xs="3" md="2" className="d-none d-lg-block shadow sidenav sticky-top px-1">
+          <Col md="2" className="d-none d-lg-block shadow sidenav sticky-top px-1">
             <Nav className="flex-column pt-2" variant="pills">
               <NavDropdown title="Select Collection">
                 <NavDropdown.Item>Collection 1</NavDropdown.Item>
@@ -100,7 +100,7 @@ export default class Panel extends React.Component {
               </LinkContainer>
             </Nav>
           </Col>
-          <Col xs="9" md="10" className="page">
+          <Col xs="12" lg="10" className="page">
             {this.props.children}
           </Col>
         </Row>
