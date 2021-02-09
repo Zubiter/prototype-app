@@ -1,0 +1,7 @@
+.extensions .card-header {
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+.extensions .card-body td:nth-child(1), .extensions .card-body th:nth-child(1) {
+    padding-left: 1.25rem;
+}
