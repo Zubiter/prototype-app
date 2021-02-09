@@ -26,11 +26,12 @@ export default class Mint extends React.Component {
           <Form.Group controlId="mint-to">
             <Form.Label>Mint to</Form.Label>
             <InputGroup>
-              <Form.Control type="text" placeholder="An Ethereum Address, start with 0x" required />
+              <Form.Control type="text" placeholder="An Ethereum Address, start with 0x" />
               <InputGroup.Append>
                 <Button variant="outline-secondary">Use Me</Button>
               </InputGroup.Append>
             </InputGroup>
+            <Form.Text className="text-muted">If leave it blank, it will only create files. You can send it in Manage Tokens.</Form.Text>
           </Form.Group>
           <Form.Group controlId="token-name">
             <Form.Label>Token Name</Form.Label>
