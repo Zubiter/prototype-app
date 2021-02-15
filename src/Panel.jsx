@@ -55,13 +55,13 @@ export default class Panel extends React.Component {
               <LinkContainer to="/1/setting">
                 <Nav.Link><AiOutlineSetting />Setting</Nav.Link>
               </LinkContainer>
-              <LinkContainer to="/1/extensions">
+              {/* <LinkContainer to="/1/extensions">
                 <Nav.Link><BsPuzzle />Extensions</Nav.Link>
               </LinkContainer>
               <div className="divider" />
               <LinkContainer to="/1/:extension">
                 <Nav.Link><BsPuzzle />Redeem</Nav.Link>
-              </LinkContainer>
+              </LinkContainer> */}
             </Nav>
             <Col className="text-lg-right px-0">
               <Button>Connect Wallet</Button>
@@ -91,13 +91,13 @@ export default class Panel extends React.Component {
               <LinkContainer to="/1/setting">
                 <Nav.Link><AiOutlineSetting />Setting</Nav.Link>
               </LinkContainer>
-              <LinkContainer to="/1/extensions">
+              {/* <LinkContainer to="/1/extensions">
                 <Nav.Link><BsPuzzle />Extensions</Nav.Link>
               </LinkContainer>
               <div className="divider" />
               <LinkContainer to="/1/redeem">
                 <Nav.Link><BsPuzzle />Redeem</Nav.Link>
-              </LinkContainer>
+              </LinkContainer> */}
             </Nav>
           </Col>
           <Col xs="12" lg="10" className="page">
