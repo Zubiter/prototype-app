@@ -8,11 +8,11 @@ import {
   Col,
   Button,
   NavDropdown,
+  Alert,
 } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import {
   BsPlusCircle,
-  BsPuzzle,
   BsCollection,
 } from 'react-icons/bs';
 import {
@@ -24,6 +24,15 @@ import {
 import './Panel.css';
 
 export default class Panel extends React.Component {
+
+  constructor (props) {
+    super(props);
+    this.state = { alert: {
+        content: 'Demo',
+        variant: 'info',
+      }
+    };
+  }
 
   render () {
     return (
@@ -101,6 +110,7 @@ export default class Panel extends React.Component {
             </Nav>
           </Col>
           <Col xs="12" lg="10" className="page">
+            <Alert variant={this.state.alert.variant} dismissible onClose={() => this.setState({alert: {content: ''}})} show={this.state.alert.content}>{this.state.alert.content}</Alert>
             {this.props.children}
           </Col>
         </Row>
