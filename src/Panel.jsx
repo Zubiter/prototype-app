@@ -21,20 +21,31 @@ import {
   AiOutlineSetting,
 } from 'react-icons/ai';
 
+import AppContext from './context';
+
 import './Panel.css';
 
 export default class Panel extends React.Component {
+  static contextType = AppContext;
 
-  constructor (props) {
-    super(props);
-    this.state = { alert: {
-        content: 'Demo',
-        variant: 'info',
-      }
-    };
+  connectToWallet () {
+    const { ctx, setCtx } = this.context;
+    ctx.ethers.provider.send('eth_requestAccounts')
+    .then(addrs => {
+      setCtx({address: addrs[0]})
+    })
+    .catch(err => {
+      console.error(err)
+    })
+  }
+
+  closeAlert (key) {
+    const { ctx, setCtx } = this.context;
+    setCtx({ alerts: ctx.alerts.filter((_, index) => index !== key)})
   }
 
   render () {
+    const { ctx } = this.context;
     return (
       <Container fluid>
         <Navbar className="shadow-sm row" sticky="top" expand="lg" bg="white">
@@ -73,7 +84,10 @@ export default class Panel extends React.Component {
               </LinkContainer> */}
             </Nav>
             <Col className="text-lg-right px-0">
-              <Button>Connect Wallet</Button>
+              { ctx.address
+                ? <span>{ctx.address}</span>
+                : <Button onClick={this.connectToWallet.bind(this)}>Connect Wallet</Button>
+              }
             </Col>
           </Navbar.Collapse>
         </Navbar>
@@ -110,7 +124,9 @@ export default class Panel extends React.Component {
             </Nav>
           </Col>
           <Col xs="12" lg="10" className="page">
-            <Alert variant={this.state.alert.variant} dismissible onClose={() => this.setState({alert: {content: ''}})} show={this.state.alert.content}>{this.state.alert.content}</Alert>
+            { ctx.alerts.map((alert, index) => 
+              <Alert key={index} variant={alert.variant} dismissible onClose={this.closeAlert.bind(this, index)}>{alert.content}</Alert>
+            )}
             {this.props.children}
           </Col>
         </Row>
