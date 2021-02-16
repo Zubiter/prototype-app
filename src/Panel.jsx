@@ -37,8 +37,8 @@ export default class Panel extends React.Component {
       const signer = ctx.ethers.provider.getSigner(addrs[0]);
       const contracts = Contract.initContracts({signer});
 
-      const ownTokensFilter = contracts.Zubiter.filters.CreateToken(addrs[0]);
-      const ownTokens = (await contracts.Zubiter.queryFilter(ownTokensFilter)).map(evt => evt.args.token);
+      const ownCollectionsFilter = contracts.Zubiter.filters.CreateToken(addrs[0]);
+      const ownCollections = (await contracts.Zubiter.queryFilter(ownCollectionsFilter)).map(evt => evt.args.token);
 
       setCtx({
         address: addrs[0],
@@ -47,9 +47,10 @@ export default class Panel extends React.Component {
           provider: ctx.ethers.provider
         },
         contracts,
-        collections: ownTokens,
+        collections: ownCollections,
       })
-      setCollection({address: ownTokens[0]})
+
+      setCollection({address: ownCollections[0]})
     })
     .catch(err => {
       setCtx({ alerts: [...ctx.alerts, {
@@ -65,6 +66,11 @@ export default class Panel extends React.Component {
     setCtx({ alerts: ctx.alerts.filter((_, index) => index !== key)})
   }
 
+  switchCollection(addr) {
+    const { setCollection } = this.context;
+    setCollection({ address: addr });
+  }
+
   render () {
     const { ctx, collection } = this.context;
     return (
@@ -77,23 +83,25 @@ export default class Panel extends React.Component {
           <Navbar.Collapse id="sm-top-navbar">
             <Nav className="mr-auto d-lg-none" variant="pills">
               <NavDropdown title={collection.address || 'Select Collection'}>
-                <NavDropdown.Item>Collection 1</NavDropdown.Item>
+                {ctx.collections.map((addr, idx) => 
+                  <NavDropdown.Item key={idx} onClick={this.switchCollection.bind(this, addr)}>{addr}</NavDropdown.Item>
+                )}
                 <NavDropdown.Divider />
                 <LinkContainer to="/create">
                   <NavDropdown.Item><BsPlusCircle />Create</NavDropdown.Item>
                 </LinkContainer>
               </NavDropdown>
               <div className="divider"/>
-              <LinkContainer to="/1/dashboard">
+              <LinkContainer exact to={`/${collection.address}/dashboard`}>
                 <Nav.Link><AiOutlineDashboard />Dashboard</Nav.Link>
               </LinkContainer>
-              <LinkContainer to="/1/mint">
+              <LinkContainer to={`/${collection.address}/mint`}>
                 <Nav.Link><AiOutlineDollarCircle />Mint</Nav.Link>
               </LinkContainer>
-              <LinkContainer to="/1/manage-tokens">
+              <LinkContainer to={`/${collection.address}/manage-tokens`}>
                 <Nav.Link><BsCollection />Manage Tokens</Nav.Link>
               </LinkContainer>
-              <LinkContainer to="/1/setting">
+              <LinkContainer to={`/${collection.address}/setting`}>
                 <Nav.Link><AiOutlineSetting />Setting</Nav.Link>
               </LinkContainer>
               {/* <LinkContainer to="/1/extensions">
@@ -116,23 +124,25 @@ export default class Panel extends React.Component {
           <Col md="2" className="d-none d-lg-block shadow sidenav sticky-top px-1">
             <Nav className="flex-column pt-2" variant="pills">
               <NavDropdown title={collection.address || 'Select Collection'}>
-                <NavDropdown.Item>Collection 1</NavDropdown.Item>
+                {ctx.collections.map((addr, idx) => 
+                  <NavDropdown.Item key={idx} onClick={this.switchCollection.bind(this, addr)}>{addr}</NavDropdown.Item>
+                )}
                 <NavDropdown.Divider />
                 <LinkContainer to="/create">
                   <NavDropdown.Item><BsPlusCircle />Create</NavDropdown.Item>
                 </LinkContainer>
               </NavDropdown>
               <div className="divider"/>
-              <LinkContainer exact to="/1/dashboard">
+              <LinkContainer exact to={`/${collection.address}/dashboard`}>
                 <Nav.Link><AiOutlineDashboard />Dashboard</Nav.Link>
               </LinkContainer>
-              <LinkContainer to="/1/mint">
+              <LinkContainer to={`/${collection.address}/mint`}>
                 <Nav.Link><AiOutlineDollarCircle />Mint</Nav.Link>
               </LinkContainer>
-              <LinkContainer to="/1/manage-tokens">
+              <LinkContainer to={`/${collection.address}/manage-tokens`}>
                 <Nav.Link><BsCollection />Manage Tokens</Nav.Link>
               </LinkContainer>
-              <LinkContainer to="/1/setting">
+              <LinkContainer to={`/${collection.address}/setting`}>
                 <Nav.Link><AiOutlineSetting />Setting</Nav.Link>
               </LinkContainer>
               {/* <LinkContainer to="/1/extensions">
