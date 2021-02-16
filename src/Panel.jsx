@@ -22,6 +22,7 @@ import {
 } from 'react-icons/ai';
 
 import AppContext from './context';
+import * as Contract from './Contracts';
 
 import './Panel.css';
 
@@ -29,11 +30,26 @@ export default class Panel extends React.Component {
   static contextType = AppContext;
 
   connectToWallet () {
-    const { ctx, setCtx } = this.context;
+    const { ctx, setCtx, setCollection } = this.context;
 
     ctx.ethers.provider.send('eth_requestAccounts')
-    .then(addrs => {
-      setCtx({address: addrs[0]})
+    .then(async addrs => {
+      const signer = ctx.ethers.provider.getSigner(addrs[0]);
+      const contracts = Contract.initContracts({signer});
+
+      const ownTokensFilter = contracts.Zubiter.filters.CreateToken(addrs[0]);
+      const ownTokens = (await contracts.Zubiter.queryFilter(ownTokensFilter)).map(evt => evt.args.token);
+
+      setCtx({
+        address: addrs[0],
+        ethers: {
+          signer,
+          provider: ctx.ethers.provider
+        },
+        contracts,
+        collections: ownTokens,
+      })
+      setCollection({address: ownTokens[0]})
     })
     .catch(err => {
       setCtx({ alerts: [...ctx.alerts, {
@@ -50,7 +66,7 @@ export default class Panel extends React.Component {
   }
 
   render () {
-    const { ctx } = this.context;
+    const { ctx, collection } = this.context;
     return (
       <Container fluid>
         <Navbar className="shadow-sm row" sticky="top" expand="lg" bg="white">
@@ -60,7 +76,7 @@ export default class Panel extends React.Component {
           <Navbar.Toggle aria-controls="sm-top-navbar" />
           <Navbar.Collapse id="sm-top-navbar">
             <Nav className="mr-auto d-lg-none" variant="pills">
-              <NavDropdown title="Select Collection">
+              <NavDropdown title={collection.address || 'Select Collection'}>
                 <NavDropdown.Item>Collection 1</NavDropdown.Item>
                 <NavDropdown.Divider />
                 <LinkContainer to="/create">
@@ -99,7 +115,7 @@ export default class Panel extends React.Component {
         <Row>
           <Col md="2" className="d-none d-lg-block shadow sidenav sticky-top px-1">
             <Nav className="flex-column pt-2" variant="pills">
-              <NavDropdown title="Select Collection">
+              <NavDropdown title={collection.address || 'Select Collection'}>
                 <NavDropdown.Item>Collection 1</NavDropdown.Item>
                 <NavDropdown.Divider />
                 <LinkContainer to="/create">

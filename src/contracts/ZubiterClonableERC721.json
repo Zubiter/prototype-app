@@ -1,4 +1,7 @@
 {
+    "address": {
+        "binance-test": "0xC9446eE71249c30E4B3fD398E6D6Eb5d813552ED"
+    },
     "abi": [
         {
             "anonymous": false,
