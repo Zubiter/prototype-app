@@ -8,11 +8,12 @@ export class ContextProvider extends React.Component {
         ctx: {
             address: null,
             netlifyToken: null,
-            currentCollection: '0x0',
+            currentCollection: null,
             collections: [
                 /*
                 * name -> string
                 * symbol -> string
+                * address -> string
                 * netlifyId -> string
                 * netlifyState -> Map<file: string, hash: string>
                 * tokensById -> Map<id: number, token: Object>
@@ -29,19 +30,11 @@ export class ContextProvider extends React.Component {
                  * variant -> string
                  * content -> string
                  */
-                {
-                    variant: 'info',
-                    content: 'Hello world!',
-                },
-                {
-                    variant: 'danger',
-                    content: 'Watch out!',
-                },
             ]
         }
     }
 
-    setCtx = ctx => this.setState(_ => ({ctx}));
+    setCtx = ctx => this.setState(prev => ({ctx: Object.assign(prev.ctx, ctx)}));
 
     constructor (props) {
         super(props);

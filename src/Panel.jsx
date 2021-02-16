@@ -30,11 +30,16 @@ export default class Panel extends React.Component {
 
   connectToWallet () {
     const { ctx, setCtx } = this.context;
+
     ctx.ethers.provider.send('eth_requestAccounts')
     .then(addrs => {
       setCtx({address: addrs[0]})
     })
     .catch(err => {
+      setCtx({ alerts: [...ctx.alerts, {
+        variant: 'danger',
+        content: 'Failed to Connect to wallet, error message: ' + err.message,
+      }]})
       console.error(err)
     })
   }
