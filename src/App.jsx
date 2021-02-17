@@ -31,26 +31,26 @@ export default class App extends React.Component {
               <Route path="/create">
                 <Create />
               </Route>
-              <Route path="/:id/dashboard">
+              <Route path="/dashboard">
                 <Dashboard />
               </Route>
-              <Route path="/:id/mint">
+              <Route path="/mint">
                 <Mint />
               </Route>
-              <Route path="/:id/manage-tokens">
+              <Route path="/manage-tokens">
                 <ManageTokens />
               </Route>
-              <Route path="/:id/setting">
+              <Route path="/setting">
                 <Setting />
               </Route>
-              <Route path="/:id/extensions">
+              <Route path="/extensions">
                 <Extensions />
               </Route>
-              <Route path="/:id/:extension">
+              <Route path="/:extension">
                 <Admin />
               </Route>
               <Route path="/">
-                <Redirect to="/1/dashboard" />
+                <Redirect to="/dashboard" />
               </Route>
             </Switch>
           </Panel>

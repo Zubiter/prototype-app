@@ -92,16 +92,16 @@ export default class Panel extends React.Component {
                 </LinkContainer>
               </NavDropdown>
               <div className="divider"/>
-              <LinkContainer exact to={`/${collection.address}/dashboard`}>
+              <LinkContainer exact to={`/dashboard`}>
                 <Nav.Link><AiOutlineDashboard />Dashboard</Nav.Link>
               </LinkContainer>
-              <LinkContainer to={`/${collection.address}/mint`}>
+              <LinkContainer to={`/mint`}>
                 <Nav.Link><AiOutlineDollarCircle />Mint</Nav.Link>
               </LinkContainer>
-              <LinkContainer to={`/${collection.address}/manage-tokens`}>
+              <LinkContainer to={`/manage-tokens`}>
                 <Nav.Link><BsCollection />Manage Tokens</Nav.Link>
               </LinkContainer>
-              <LinkContainer to={`/${collection.address}/setting`}>
+              <LinkContainer to={`/setting`}>
                 <Nav.Link><AiOutlineSetting />Setting</Nav.Link>
               </LinkContainer>
               {/* <LinkContainer to="/1/extensions">
@@ -133,16 +133,16 @@ export default class Panel extends React.Component {
                 </LinkContainer>
               </NavDropdown>
               <div className="divider"/>
-              <LinkContainer exact to={`/${collection.address}/dashboard`}>
+              <LinkContainer exact to={`/dashboard`}>
                 <Nav.Link><AiOutlineDashboard />Dashboard</Nav.Link>
               </LinkContainer>
-              <LinkContainer to={`/${collection.address}/mint`}>
+              <LinkContainer to={`/mint`}>
                 <Nav.Link><AiOutlineDollarCircle />Mint</Nav.Link>
               </LinkContainer>
-              <LinkContainer to={`/${collection.address}/manage-tokens`}>
+              <LinkContainer to={`/manage-tokens`}>
                 <Nav.Link><BsCollection />Manage Tokens</Nav.Link>
               </LinkContainer>
-              <LinkContainer to={`/${collection.address}/setting`}>
+              <LinkContainer to={`/setting`}>
                 <Nav.Link><AiOutlineSetting />Setting</Nav.Link>
               </LinkContainer>
               {/* <LinkContainer to="/1/extensions">
