@@ -29,11 +29,12 @@ export class ContextProvider extends React.Component {
             symbol: null,
             address: null,
             netlifyId: null,
-            netlifyState: {}, // file name => file hash
+            netlifyToken: null,
             tokensById: {}, // id => token meta
             tokens: [], // array<num>
             events: [], // transfer events
-        }
+        },
+        collectionAddressMap: {} // address => collection name
     }
 
     setCtx = ctx => this.setState(prev => ({ctx: Object.assign(prev.ctx, ctx)}));
