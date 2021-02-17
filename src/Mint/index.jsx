@@ -43,12 +43,7 @@ export default class Mint extends React.Component {
           </Form.Group>
           <Form.Group controlId="token-image">
             <Form.Label>Token Image</Form.Label>
-            <InputGroup>
-              <Form.Control type="text" placeholder="Paste URL or Upload" required />
-              <InputGroup.Append>
-                <Button variant="outline-secondary">Select File</Button>
-              </InputGroup.Append>
-            </InputGroup>
+            <Form.Control type="text" placeholder="Paste URL or Upload" required />
           </Form.Group>
           <Accordion>
             <Accordion.Toggle as={Button} eventKey="0" className="mb-3 float-right" size="sm" variant="secondary">Advanced Fields</Accordion.Toggle>
@@ -65,12 +60,7 @@ export default class Mint extends React.Component {
                 </Form.Group>
                 <Form.Group controlId="token-animation">
                   <Form.Label>Token Animation</Form.Label>
-                  <InputGroup>
-                    <Form.Control type="text" placeholder="Paste URL or Upload" required />
-                    <InputGroup.Append>
-                      <Button variant="outline-secondary">Select File</Button>
-                    </InputGroup.Append>
-                  </InputGroup>
+                  <Form.Control type="text" placeholder="Paste URL or Upload" required />
                   <Form.Text className="text-muted">A URL to a multi-media attachment for the item.</Form.Text>
                 </Form.Group>
                 <Form.Group controlId="token-youtube-url">

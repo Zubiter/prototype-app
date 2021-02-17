@@ -48,11 +48,13 @@ export default class Create extends React.Component {
       fs.mkdir(`/${token}`, err => {
         if (err) return rej(err);
 
+        localStorage.setItem(`collection-${token}`, values['collection-name']);
         fs.writeFile(`/${token}/collection`, JSON.stringify({
           name: values['collection-name'],
           description: values['collection-description'],
           image: values['collection-image'],
-          external_link: values['collection-external-link']
+          external_link: values['collection-external-link'],
+          address: token,
         }), err => {
           if (err) return rej(err);
           this.setState(prev => Object.assign({}, { ...this.state, stage: prev.stage + 1 }))
