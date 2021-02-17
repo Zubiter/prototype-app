@@ -7,7 +7,6 @@ export class ContextProvider extends React.Component {
     state = {
         ctx: {
             address: null,
-            netlifyToken: null,
             collections: [], // array<address>
             ethers: {
                 provider: null,
@@ -28,8 +27,6 @@ export class ContextProvider extends React.Component {
             name: null,
             symbol: null,
             address: null,
-            netlifyId: null,
-            netlifyToken: null,
             tokensById: {}, // id => token meta
             tokens: [], // array<num>
             events: [], // transfer events
@@ -46,6 +43,7 @@ export class ContextProvider extends React.Component {
         if (window.ethereum) {
             this.state.ctx.ethers.provider = new ethers.providers.Web3Provider(window.ethereum);
         }
+        window.ctx = this.state
     }
 
     render() {
