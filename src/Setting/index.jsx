@@ -15,7 +15,22 @@ export default class Setting extends React.Component {
     return (
       <Container className="setting">
         <h2>Setting</h2>
-        <p className="text-muted">If no NFT and data will be minted or updated in this collection, migrate it to IPFS and renounce ownership might be a good idea.</p>
+        {/* <p className="text-muted">If no NFT and data will be minted or updated in this collection, migrate it to IPFS and renounce ownership might be a good idea.</p> */}
+        <h4>Export Files</h4>
+        <Button variant="primary" type="button">
+          Save as ZIP
+        </Button>
+        <p className="small text-muted">If you use Netlify to serve files, you can upload the zip in <a href="https://app.netlify.com/" target="_blank" rel="noreferrer">App</a> &gt; Site &gt; Deploys.</p>
+        {/*
+        <h4>Import Files</h4>
+        <Button variant="primary" type="button">
+          Import ZIP
+        </Button> &nbsp;
+        <Button variant="outline-primary" type="button">
+          Sync with Base URL
+        </Button>
+        <p className="small text-muted">All data are stored in browser, after cleared data, you will need to import.</p>
+        */}
         <h4>Collection Setting</h4>
         <Form className="mb-3">
           <Form.Group controlId="collection-name">
@@ -25,6 +40,11 @@ export default class Setting extends React.Component {
           <Form.Group controlId="collection-symbol">
             <Form.Label>Collection Symbol</Form.Label>
             <Form.Control type="text" placeholder="Enter Collection Symbol, such as &quot;MAN&quot;" required />
+          </Form.Group>
+          <Form.Group controlId="collection-base-url">
+            <Form.Label>Collection Base URL</Form.Label>
+            <Form.Control type="url" placeholder="https://" required />
+            <Form.Text className="text-muted">You can use <a href="https://netlify.com" target="_blank" rel="noreferrer">Netlify</a>.</Form.Text>
           </Form.Group>
           <Form.Group controlId="collection-description">
             <Form.Label>Collection Description</Form.Label>
@@ -47,7 +67,7 @@ export default class Setting extends React.Component {
             Submit
           </Button>
         </Form>
-        <h4>File Provider Setting</h4>
+        {/* <h4>File Provider Setting</h4>
         <Form className="mb-3">
           <Form.Group controlId="netlify-access-token">
             <Form.Label>Netlify Access Token</Form.Label>
@@ -64,7 +84,7 @@ export default class Setting extends React.Component {
           <Button variant="outline-primary" type="button">
             Migrate to IPFS
           </Button>
-        </Form>
+        </Form> */}
         <Container className="p-0">
           <h4>Danger Zone</h4>
           <Row className="m-0">
