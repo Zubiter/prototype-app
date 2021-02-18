@@ -64,9 +64,13 @@ export default class Create extends React.Component {
     }));
 
     return Promise.all([createToken, setBaseURI, createFile])
-    .then(() => {
+    .then(([token]) => {
       setSubmitting(false);
       this.setState({ finished: true });
+      setCtx({ alerts: [...ctx.alerts, {
+        variant: 'success',
+        content: 'Created Collection at ' + token,
+      }]})
     })
     .catch(err => {
       setSubmitting(false);
@@ -78,10 +82,9 @@ export default class Create extends React.Component {
   }
 
   render () {
-    const { collection } = this.context;
     return (
       <Container>
-        { this.state.finished ? <Redirect to={`/${collection.address}/dashboard`} /> : ''}
+        { this.state.finished ? <Redirect to={`/dashboard`} /> : ''}
         <h2 className="page-title">Create a New Collection</h2>
         {/* <section className={this.state.step === 1 ? '' : 'd-none'}>
           <h3>Step 1. Setup Netlify</h3>
