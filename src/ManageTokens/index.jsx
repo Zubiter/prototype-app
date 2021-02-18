@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 
 import {
   Container,
@@ -8,11 +8,252 @@ import {
   Table,
   Pagination,
   Button,
+  InputGroup,
+  FormControl,
+  Modal,
+  Form,
+  Accordion,
 } from 'react-bootstrap';
+import { Formik } from 'formik';
+
+import AppContext from '../context';
+
+import fs from '../fs';
 
 import './ManageTokens.css';
+window.fs=fs;
+
+function Token (props) {
+  const [ ownerAddress, setOwnerAddress ] = useState('Loading');
+  const [ mintTo, setMintTo ] = useState('');
+  const [ minting, setMinting ] = useState(false);
+  const { ctx, collection, setCtx } = useContext(AppContext);
+
+  const contract = ctx.contracts.ZubiterClonableERC721.attach(collection.address);
+  useEffect(() => {
+    contract.ownerOf(props.tokenId)
+    .then(owner => {
+      setOwnerAddress(owner.toString());
+    })
+    .catch(() => {
+      setOwnerAddress(null);
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); 
+
+  function sendMintTx(mintTo) {
+    setOwnerAddress('Minting...');
+    setMinting(false);
+    contract['mint(address,uint256)'](mintTo, props.tokenId)
+    .then(tx => {
+      tx.wait().then(() => {
+        setOwnerAddress(mintTo);
+      });
+    })
+    .catch(err => {
+      setCtx({ alerts: [...ctx.alerts, {
+        variant: 'danger',
+        content: 'Failed to mint, error message: ' + err.message,
+      }]});
+      setOwnerAddress(null);
+    })
+  }
+
+  return (
+    <tr>
+      <td>{props.tokenId}</td>
+      <td>{ownerAddress || (
+        minting ? 
+          <InputGroup>
+            <FormControl value={mintTo} onChange={evt => setMintTo(evt.target.value)} type="text" placeholder="An Ethereum Address, start with 0x" />
+            <InputGroup.Append>
+              <Button variant="outline-secondary" onClick={() => setMintTo(ctx.address)}>Use Me</Button>
+              <Button variant="outline-secondary" onClick={() => sendMintTx(mintTo)}>Mint</Button>
+            </InputGroup.Append>
+          </InputGroup>
+          : <Button variant="primary" onClick={() => setMinting(true)}>Mint</Button>
+      )}</td>
+      <td><Button variant="primary" onClick={() => props.showEditModal(props.tokenId)}>Edit</Button></td>
+    </tr>
+  );
+}
+
+function EditModal (props) {
+  const { collection } = useContext(AppContext);
+  const [ form, setForm ] = useState({
+    'token-name': '',
+    'token-description': '',
+    'token-image': '',
+    'token-background-color': '',
+    'token-external-url': '',
+    'token-animation': '',
+    'token-youtube-url': '',
+    'token-attributes': '',
+  });
+
+  useEffect(() => {
+    let unmount = false;
+    fs.readFile(`/${collection.address}/${props.tokenId}`, (err, content) => {
+      if (err) throw err;
+
+      let data;
+      try {
+        data = JSON.parse(content);
+      } catch (_) {
+        data = {};
+      }
+
+      if (!unmount) setForm({
+        'token-name': data.name || '',
+        'token-description': data.description || '',
+        'token-image': data.image || '',
+        'token-background-color': data.background_color || '',
+        'token-external-url': data.external_url || '',
+        'token-animation': data.animation_url || '',
+        'token-youtube-url': data.youtube_url || '',
+        'token-attributes': data.attributes ? JSON.stringify(data.attributes) : '',
+      });
+    });
+
+    return () => unmount = true;
+  }
+  , [props.show, collection.address, props.tokenId]);
+
+  if (!collection.address || !props.show) return null;
+
+  function updateToken(values, { setSubmitting }) {
+    const attributes = (text => {
+      if (text.length === 0) return null;
+      
+      try {
+        return JSON.parse(text);
+      } catch (_) {
+        return false;
+      }
+    })(values['token-attributes']);
+
+    if (attributes === false) {
+      setSubmitting(false)
+      return alert('Failed to parse attributes, please check if is valid json');
+    }
+    fs.writeFile(`/${collection.address}/${props.tokenId}`, JSON.stringify({
+      image: values['token-image'], 
+      external_url: values['token-external-url'],
+      description: values['token-description'],
+      name: values['token-name'],
+      attributes: attributes,
+      background_color: values['token-background-color'],
+      animation_url: values['token-animation'],
+      youtube_url: values['token-youtube-url'],
+    }), err => {
+      if (err) throw err;
+      props.onHide()
+    });
+  }
+
+  return (
+    <Modal show={props.show} onHide={props.onHide}>
+      <Formik onSubmit={updateToken} enableReinitialize initialValues={{
+        'token-id': props.tokenId,
+        ...form,
+      }}>
+      {({values, handleSubmit, handleChange, isSubmitting}) =>
+      (
+        <Form onSubmit={handleSubmit}>
+          <Modal.Header closeButton>
+            <Modal.Title>Edit Token</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+              <Form.Group controlId="token-id">
+                <Form.Label>Token ID</Form.Label>
+                <Form.Control value={values['token-id']} onChange={handleChange} type="number" placeholder="Determin Token ID" disabled />
+              </Form.Group>
+              <Form.Group controlId="token-name">
+                <Form.Label>Token Name</Form.Label>
+                <Form.Control value={values['token-name']} onChange={handleChange} type="text" placeholder="An Awesome Cat" required />
+              </Form.Group>
+              <Form.Group controlId="token-description">
+                <Form.Label>Token Description</Form.Label>
+                <Form.Control value={values['token-description']} onChange={handleChange} as="textarea" placeholder="A cat with colorful fur." required />
+              </Form.Group>
+              <Form.Group controlId="token-image">
+                <Form.Label>Token Image</Form.Label>
+                <Form.Control value={values['token-image']} onChange={handleChange} type="text" placeholder="Paste URL or Upload" required />
+              </Form.Group>
+              <Accordion>
+                <Accordion.Toggle as={Button} eventKey="0" className="mb-3 float-right" size="sm" variant="secondary">Advanced Fields</Accordion.Toggle>
+                <div className="clearfix"></div>
+                <Accordion.Collapse eventKey="0">
+                  <>
+                    <Form.Group controlId="token-background-color">
+                      <Form.Label>Token Background Color</Form.Label>
+                      <Form.Control value={values['token-background-color']} onChange={handleChange} type="text" placeholder="#fff" />
+                    </Form.Group>
+                    <Form.Group controlId="token-external-url">
+                      <Form.Label>Token External URL</Form.Label>
+                      <Form.Control value={values['token-external-url']} onChange={handleChange} type="text" placeholder="https://zubiter.limaois.me/tokens/0xaddroftoken/tokenid" />
+                    </Form.Group>
+                    <Form.Group controlId="token-animation">
+                      <Form.Label>Token Animation</Form.Label>
+                      <Form.Control value={values['token-animation']} onChange={handleChange} type="text" placeholder="Paste URL" />
+                      <Form.Text className="text-muted">A URL to a multi-media attachment for the item.</Form.Text>
+                    </Form.Group>
+                    <Form.Group controlId="token-youtube-url">
+                      <Form.Label>Token YouTube URL</Form.Label>
+                      <Form.Control value={values['token-youtube-url']} onChange={handleChange} type="text" placeholder="https://www.youtube.com/watch?v=0EX3tQWswj0" />
+                      <Form.Text className="text-muted">A URL to a YouTube video.</Form.Text>
+                    </Form.Group>
+                    <Form.Group controlId="token-attributes">
+                      <Form.Label>Token Attributes</Form.Label>
+                      <Form.Control value={values['token-attributes']} onChange={handleChange} as="textarea" placeholder="[{&quot;key&quot;:&quot;value&quot;}]" />
+                    </Form.Group>
+                  </>
+                </Accordion.Collapse>
+              </Accordion>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={props.onHide}>
+              Close
+            </Button>
+            <Button variant="primary" type="submit" disabled={isSubmitting}>
+              { isSubmitting ? `Processing` : 'Save'}
+            </Button>
+          </Modal.Footer>
+        </Form>
+      )}</Formik>
+    </Modal>
+  );
+}
 
 export default class ManageTokens extends React.Component {
+  static contextType = AppContext;
+
+  constructor (props) {
+    super(props);
+    this.state = {
+      viewingPage: 1,
+      tokenList: [],
+      showingEditModal: false,
+      editingTokenId: 1,
+      showingAddress: null
+    }
+  }
+
+  componentDidMount() {
+    this.componentDidUpdate();
+  }
+
+  componentDidUpdate() {
+    const { collection } = this.context;
+    if (this.state.showingAddress !== collection.address) {
+      fs.readdir(`/${collection.address}`, (err, list) => {
+        if (err) throw err;
+        this.setState({tokenList: list.filter(e => !isNaN(e)).map(e => parseInt(e))});
+      });
+      this.setState({showingAddress: collection.address});
+    }
+  }
+
   render () {
     return (
       <Container className="manage-tokens">
@@ -31,69 +272,32 @@ export default class ManageTokens extends React.Component {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>177</td>
-                      <td>0x203ba1df1d1d322a421f070f580fbc4051a7921d</td>
-                      <td><Button>Edit</Button></td>
-                    </tr>
-                    <tr>
-                      <td>178</td>
-                      <td>0x203ba1df1d1d322a421f070f580fbc4051a7921d</td>
-                      <td><Button>Edit</Button></td>
-                    </tr>
-                    <tr>
-                      <td>179</td>
-                      <td>0x203ba1df1d1d322a421f070f580fbc4051a7921d</td>
-                      <td><Button>Edit</Button></td>
-                    </tr>
-                    <tr>
-                      <td>180</td>
-                      <td>0x203ba1df1d1d322a421f070f580fbc4051a7921d</td>
-                      <td><Button>Edit</Button></td>
-                    </tr>
-                    <tr>
-                      <td>181</td>
-                      <td>0x203ba1df1d1d322a421f070f580fbc4051a7921d</td>
-                      <td><Button>Edit</Button></td>
-                    </tr>
-                    <tr>
-                      <td>182</td>
-                      <td>0x203ba1df1d1d322a421f070f580fbc4051a7921d</td>
-                      <td><Button>Edit</Button></td>
-                    </tr>
-                    <tr>
-                      <td>183</td>
-                      <td>0x203ba1df1d1d322a421f070f580fbc4051a7921d</td>
-                      <td><Button>Edit</Button></td>
-                    </tr>
-                    <tr>
-                      <td>184</td>
-                      <td>0x203ba1df1d1d322a421f070f580fbc4051a7921d</td>
-                      <td><Button>Edit</Button></td>
-                    </tr>
-                    <tr>
-                      <td>185</td>
-                      <td>0x203ba1df1d1d322a421f070f580fbc4051a7921d</td>
-                      <td><Button>Edit</Button></td>
-                    </tr>
-                    <tr>
-                      <td>186</td>
-                      <td><Button>Mint it</Button></td>
-                      <td><Button>Edit</Button></td>
-                    </tr>
+                    { this.state.tokenList.slice(5 * (this.state.viewingPage - 1), 5 * this.state.viewingPage).map(tokenId => 
+                      <Token
+                        tokenId={tokenId}
+                        key={tokenId}
+                        showEditModal={() => this.setState({showingEditModal: true, editingTokenId: tokenId})}
+                      />
+                    )}
                   </tbody>
                 </Table>
                 <Row className="justify-content-between px-3 pb-2">
-                  <Col>Showing 1 to 10 of 12,541 tokens</Col>
+                  <Col>Showing {this.state.viewingPage * 5 - 4} to {this.state.viewingPage * 5} of {this.state.tokenList.length} tokens.</Col>
                   <Col>
                     <Pagination className="justify-content-end">
-                      <Pagination.First />
-                      <Pagination.Prev />
-                      <Pagination.Item active>{1}</Pagination.Item>
-                      <Pagination.Item>{2}</Pagination.Item>
-                      <Pagination.Item>{3}</Pagination.Item>
-                      <Pagination.Next />
-                      <Pagination.Last />
+                      { this.state.viewingPage !== 1 ? 
+                      <>
+                        <Pagination.First onClick={() => this.setState({viewingPage: 1})}/>
+                        <Pagination.Prev onClick={() => this.setState(prev => ({viewingPage: Math.max(1, prev.viewingPage - 1)}))} />
+                      </>
+                      : ''}
+                      <Pagination.Item active>{this.state.viewingPage}</Pagination.Item>
+                      { this.state.viewingPage !== Math.ceil(this.state.tokenList.length / 5) ? 
+                      <>
+                        <Pagination.Next onClick={() => this.setState(prev => ({viewingPage: Math.min(Math.ceil(this.state.tokenList.length / 5), prev.viewingPage + 1)}))} />
+                        <Pagination.Last  onClick={() => this.setState({viewingPage: Math.ceil(this.state.tokenList.length / 5)})}/>
+                      </>
+                      : ''}
                     </Pagination>
                   </Col>
                 </Row>
@@ -101,6 +305,11 @@ export default class ManageTokens extends React.Component {
             </Card>
           </Col>
         </Row>
+        <EditModal
+          show={this.state.showingEditModal}
+          onHide={() => this.setState({showingEditModal: false})}
+          tokenId={this.state.editingTokenId}
+        />
       </Container>
     );
   }
