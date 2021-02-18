@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   Redirect,
+  useLocation,
 } from 'react-router-dom';
 
 import Panel from './Panel';
@@ -19,19 +20,18 @@ import AppContext, { ContextProvider } from './context';
 
 import './App.css';
 
-class Connected extends React.Component {
-  static contextType = AppContext;
+function Connected (props) {
+  const { ctx } = useContext(AppContext);
+  const location = useLocation();
 
-  render() {
-    return (<>
-      { this.context.ctx.address ? (
-          this.context.ctx.collections.length ? (
-            <>{this.props.children}</>
-          ) : <Redirect to="/create" />
-        ) : <h2>Connect Wallet to Start</h2>
-      }
-    </>);
-  }
+  return (<>
+    { ctx.address ?
+      <>
+        {ctx.collections.length === 0 && location.pathname !== '/create' ?  <Redirect to="/create" />: props.children }
+      </>
+      : <h2>Connect Wallet to Start</h2>
+    }
+  </>);
 }
 
 export default class App extends React.Component {
