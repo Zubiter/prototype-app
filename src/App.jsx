@@ -19,40 +19,55 @@ import AppContext, { ContextProvider } from './context';
 
 import './App.css';
 
-export default class App extends React.Component {
+class Connected extends React.Component {
   static contextType = AppContext;
 
+  render() {
+    return (<>
+      { this.context.ctx.address ? (
+          this.context.ctx.collections.length ? (
+            <>{this.props.children}</>
+          ) : <Redirect to="/create" />
+        ) : <h2>Connect Wallet to Start</h2>
+      }
+    </>);
+  }
+}
+
+export default class App extends React.Component {
   render () {
     return (
       <ContextProvider>
         <Router>
           <Panel>
-            <Switch>
-              <Route path="/create">
-                <Create />
-              </Route>
-              <Route path="/dashboard">
-                <Dashboard />
-              </Route>
-              <Route path="/mint">
-                <Mint />
-              </Route>
-              <Route path="/manage-tokens">
-                <ManageTokens />
-              </Route>
-              <Route path="/setting">
-                <Setting />
-              </Route>
-              <Route path="/extensions">
-                <Extensions />
-              </Route>
-              <Route path="/:extension">
-                <Admin />
-              </Route>
-              <Route path="/">
-                <Redirect to="/dashboard" />
-              </Route>
-            </Switch>
+            <Connected>
+              <Switch>
+                <Route path="/create">
+                  <Create />
+                </Route>
+                <Route path="/dashboard">
+                  <Dashboard />
+                </Route>
+                <Route path="/mint">
+                  <Mint />
+                </Route>
+                <Route path="/manage-tokens">
+                  <ManageTokens />
+                </Route>
+                <Route path="/setting">
+                  <Setting />
+                </Route>
+                <Route path="/extensions">
+                  <Extensions />
+                </Route>
+                <Route path="/:extension">
+                  <Admin />
+                </Route>
+                <Route path="/">
+                  <Redirect to="/dashboard" />
+                </Route>
+              </Switch>
+            </Connected>
           </Panel>
         </Router>
       </ContextProvider>
