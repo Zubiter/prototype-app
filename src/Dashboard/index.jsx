@@ -25,12 +25,17 @@ export default class Dashboard extends React.Component {
       txs: [],
       transactionPage: 1,
       tokenOwnerPage: 1,
+      showingAddress: null
     }
   }
 
-  async componentDidMount() {
+  componentDidMount() {
+    this.componentDidUpdate();
+  }
+
+  async componentDidUpdate() {
     const { ctx, collection } = this.context;
-    if (collection.address) {
+    if (this.state.showingAddress !== collection.address) {
       const contract = ctx.contracts.ZubiterClonableERC721.attach(collection.address);
       const transferTxFilter = contract.filters.Transfer(null);
       const txs = (await contract.queryFilter(transferTxFilter));
@@ -38,7 +43,8 @@ export default class Dashboard extends React.Component {
       this.setState({
         totalSupply: (await contract.totalSupply()).toNumber(),
         totalTxs: txs.length,
-        txs
+        txs,
+        showingAddress: collection.address,
       });
     }
   }
