@@ -45,7 +45,6 @@ export default class Mint extends React.Component {
     const { ctx, setCtx, collection } = this.context;
 
     const attributes = this.parseAttribute(values['token-attributes']);
-    console.log(values)
     if (attributes === false) {
       setSubmitting(false);
       setCtx({ alerts: [...ctx.alerts, {
