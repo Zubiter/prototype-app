@@ -1,6 +1,7 @@
 {
     "address": {
-        "binance-test": "0xC9446eE71249c30E4B3fD398E6D6Eb5d813552ED"
+        "binance-test": "0xC9446eE71249c30E4B3fD398E6D6Eb5d813552ED",
+        "kovan": "0x1976fae3085def61db39193da6c1dbdd6b5e8330"
     },
     "abi": [
         {

@@ -26,6 +26,10 @@ import * as Contract from './Contracts';
 
 import './Panel.css';
 
+const networkMap = {
+  42: 'kovan',
+  97: 'binance-test',
+}
 export default class Panel extends React.Component {
   static contextType = AppContext;
 
@@ -34,8 +38,9 @@ export default class Panel extends React.Component {
 
     ctx.ethers.provider.send('eth_requestAccounts')
     .then(async addrs => {
+      const network = networkMap[(await ctx.ethers.provider.getNetwork()).chainId];
       const signer = ctx.ethers.provider.getSigner(addrs[0]);
-      const contracts = Contract.initContracts({signer});
+      const contracts = Contract.initContracts({signer}, network);
 
       const ownCollectionsFilter = contracts.Zubiter.filters.CreateToken(addrs[0]);
       const ownCollections = (await contracts.Zubiter.queryFilter(ownCollectionsFilter)).map(evt => evt.args.token);
