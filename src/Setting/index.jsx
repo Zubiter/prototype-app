@@ -138,8 +138,7 @@ export default function Setting() {
             });
           });
         }
-        console.log(fileInput)
-        console.log(fileInput.current)
+
         if (fileInput.current.files.length) {
           const file = fileInput.current.files[0];
           const fileReader = new FileReader();

@@ -21,7 +21,6 @@ import AppContext from '../context';
 import fs from '../fs';
 
 import './ManageTokens.css';
-window.fs=fs;
 
 function Token (props) {
   const [ ownerAddress, setOwnerAddress ] = useState('Loading');

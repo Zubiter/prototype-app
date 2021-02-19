@@ -31,7 +31,6 @@ export default class Mint extends React.Component {
       contract: null,
     };
     this.formInjector = React.createRef();
-    window.fs = fs;
   }
 
   async componentDidMount() {
