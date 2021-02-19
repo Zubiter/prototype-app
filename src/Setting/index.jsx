@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 
@@ -8,6 +8,7 @@ import {
   Button,
   Row,
   Modal,
+  InputGroup,
 } from 'react-bootstrap';
 import { Formik } from 'formik';
 
@@ -76,6 +77,7 @@ export default function Setting() {
   });
   const [ showRenounceModal, setShowRenounceModal ] = useState(false);
   const [ generatingZip, setGeneratingZip ] = useState(false);
+  const [ baseURI, setBaseURI ] = useState('');
   const contract = ctx.contracts.ZubiterClonableERC721.attach(collection.address);
   useEffect(() => {
     let unmount = false;
@@ -101,7 +103,9 @@ export default function Setting() {
       setCollection({name: data.name});
     });
     contract.baseURI().then(uri => {
-      if (!unmount) setForm(prev => ({...prev, 'collection-base-uri': uri}));
+      if (unmount) return;
+      setForm(prev => ({...prev, 'collection-base-uri': uri}));
+      setBaseURI(uri);
     });
 
     return () => unmount = true;
@@ -110,6 +114,7 @@ export default function Setting() {
   , [collection.address]);
   const [ stage, setStage ] = useState(0);
   const [ totalStage, setTotalStage ] = useState(1);
+  const fileInput = useRef(null);
 
   function updateCollection(values, { setSubmitting }) {
     setStage(0);
@@ -133,6 +138,21 @@ export default function Setting() {
             });
           });
         }
+        console.log(fileInput)
+        console.log(fileInput.current)
+        if (fileInput.current.files.length) {
+          const file = fileInput.current.files[0];
+          const fileReader = new FileReader();
+          fileReader.onloadend = () => {
+            fs.writeFile(`/${collection.address}/assets/${file.name}`, Buffer.from(fileReader.result), err => {
+              if (err) setCtx({ alerts: [...ctx.alerts, {
+                variant: 'danger',
+                content: 'Failed to upload file, error message: ' + err,
+              }]});
+            });
+          };
+          fileReader.readAsArrayBuffer(file);
+        }
 
         fs.writeFile(`/${collection.address}/collection`, JSON.stringify({
           name: values['collection-name'],
@@ -154,7 +174,8 @@ export default function Setting() {
       setCtx({ alerts: [...ctx.alerts, {
         variant: 'success',
         content: 'Collection update successed',
-      }]})
+      }]});
+      setBaseURI(values['collection-base-uri']);
     })
     .catch(err => {
       setSubmitting(false);
@@ -172,13 +193,35 @@ export default function Setting() {
 /:placeholder
   Content-Type: application/json`);
     (new Promise(res => {
+      // export root files
       fs.readdir(`/${collection.address}`, (err, files) => {
         if (err) throw err;
-        res(Promise.all(files.map(file => {
+
+        const decoder = new TextDecoder();
+        res(Promise.all(files.filter(file => file !== 'assets').map(file => {
           return new Promise(res_ => {
             fs.readFile(`/${collection.address}/${file}`, (err, content) => {
               if (err) throw err;
+
+              content = decoder.decode(content).replace('{base-uri}', baseURI);
               zip.file(file, content);
+              res_(true);
+            });
+          });
+        })));
+      });
+    }))
+    .then(() => new Promise(res => {
+      // export asset files
+      fs.readdir(`/${collection.address}/assets`, (err, files) => {
+        if (err) throw err;
+        if (files.length === 0) return res(true)
+        const assets = zip.folder('assets')
+        res(Promise.all(files.map(file => {
+          return new Promise(res_ => {
+            fs.readFile(`/${collection.address}/assets/${file}`, (err, content) => {
+              if (err) throw err;
+              assets.file(file, content);
               res_(true);
             });
           });
@@ -194,6 +237,17 @@ export default function Setting() {
     });
   }
 
+  function askForFile() {
+    fileInput.current.click();    
+  }
+
+  function handleImageSelect(setValue, event) {
+    if (event.target.files.length === 0) return;
+
+    const file = event.target.files[0];
+    setValue(`{base-uri}assets/${file.name}`);
+  }
+
   return (
     <Container className="setting">
       <h2>Setting</h2>
@@ -202,7 +256,7 @@ export default function Setting() {
       <Button variant="primary" type="button" disabled={generatingZip} onClick={buildZip}>
         { generatingZip ? 'Generating' : 'Save as ZIP' }
       </Button>
-      <p className="small text-muted">If you use Netlify to serve files, you can upload the zip in <a href="https://app.netlify.com/" target="_blank" rel="noreferrer">App</a> &gt; Site &gt; Deploys.</p>
+      <p className="small text-muted">If you use Netlify to serve files, you can upload the zip in <a href="https://app.netlify.com/" target="_blank" rel="noreferrer">App</a> &gt; Site (&gt; Deploys when updating).</p>
       {/*
       <h4>Import Files</h4>
       <Button variant="primary" type="button">
@@ -219,7 +273,7 @@ export default function Setting() {
         enableReinitialize
         initialValues={{ ...form }}
       >
-        {({values, handleSubmit, handleChange, isSubmitting}) => (
+        {({values, handleSubmit, handleChange, isSubmitting, setFieldValue}) => (
           <Form onSubmit={handleSubmit}>
             <Form.Group controlId="collection-name">
               <Form.Label>Collection Name</Form.Label>
@@ -227,7 +281,7 @@ export default function Setting() {
             </Form.Group>
             <Form.Group controlId="collection-base-uri">
               <Form.Label>Collection Base URI</Form.Label>
-              <Form.Control value={values['collection-base-uri']} onChange={handleChange} type="url" placeholder="https://" required />
+              <Form.Control value={values['collection-base-uri']} onChange={handleChange} type="url" placeholder="https://" />
               <Form.Text className="text-muted">You can use <a href="https://netlify.com" target="_blank" rel="noreferrer">Netlify</a>.</Form.Text>
             </Form.Group>
             <Form.Group controlId="collection-description">
@@ -240,7 +294,13 @@ export default function Setting() {
             </Form.Group>
             <Form.Group controlId="collection-image">
               <Form.Label>Collection Image</Form.Label>
-              <Form.Control value={values['collection-image']} onChange={handleChange} type="url" placeholder="(Optional) Enter Collection Image URL" />
+              <InputGroup>
+                <Form.Control value={values['collection-image']} onChange={handleChange} type="text" placeholder="(Optional) Enter Collection Image URL" />
+                  <InputGroup.Append>
+                  <Button variant="outline-secondary" onClick={() => askForFile()}>Select File</Button>
+                  <input type="file" ref={fileInput} onChange={evt => handleImageSelect(setFieldValue.bind(this, 'collection-image'), evt)} hidden/>
+                </InputGroup.Append>
+              </InputGroup>
             </Form.Group>
             <Button variant="primary" type="submit" disabled={isSubmitting}>
               { isSubmitting ? `Processing (${stage}/${totalStage})` : 'Submit' }

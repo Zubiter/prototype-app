@@ -4,13 +4,14 @@ import {
   Container,
   Form,
   Button,
+  InputGroup,
 } from 'react-bootstrap';
 import { Formik } from 'formik';
 import { Redirect } from 'react-router-dom';
 
 import AppContext from '../context';
 
-import fs from '../fs';
+import fs, { Buffer } from '../fs';
 
 import './Create.css';
 
@@ -24,6 +25,8 @@ export default class Create extends React.Component {
       totalStage: 2,
       finished: false
     };
+
+    this.fileInput = React.createRef();
   }
 
   submitForm(values, { setSubmitting }) {
@@ -57,6 +60,25 @@ export default class Create extends React.Component {
         if (err) return rej(err);
 
         localStorage.setItem(`collection-${token}`, values['collection-name']);
+
+        fs.mkdir(`/${token}/assets`, err => {
+          if (err) throw err;
+
+          if (this.fileInput.current.files.length) {
+            const file = this.fileInput.current.files[0];
+            const fileReader = new FileReader();
+            fileReader.onloadend = () => {
+              fs.writeFile(`/${token}/assets/${file.name}`, Buffer.from(fileReader.result), err => {
+                if (err) setCtx({ alerts: [...ctx.alerts, {
+                  variant: 'danger',
+                  content: 'Failed to upload file, error message: ' + err,
+                }]});
+              });
+            };
+            fileReader.readAsArrayBuffer(file);
+          }
+        });
+
         fs.writeFile(`/${token}/collection`, JSON.stringify({
           name: values['collection-name'],
           description: values['collection-description'],
@@ -87,6 +109,18 @@ export default class Create extends React.Component {
         content: 'Failed to Create token, error message: ' + err,
       }]})
     });
+  }
+
+  askForFile() {
+    const fileInput = this.fileInput.current;
+    fileInput.click();    
+  }
+
+  handleImageSelect(setValue, event) {
+    if (event.target.files.length === 0) return;
+
+    const file = event.target.files[0];
+    setValue(`{base-uri}assets/${file.name}`);
   }
 
   render () {
@@ -125,7 +159,7 @@ export default class Create extends React.Component {
               'collection-external-link': '',
             }}
           >
-            {({values, handleSubmit, handleChange, isSubmitting}) => (
+            {({values, handleSubmit, handleChange, isSubmitting, setFieldValue}) => (
               <Form onSubmit={handleSubmit}>
                 <Form.Group controlId="collection-name">
                   <Form.Label>Collection Name</Form.Label>
@@ -150,7 +184,13 @@ export default class Create extends React.Component {
                 </Form.Group>
                 <Form.Group controlId="collection-image">
                   <Form.Label>Collection Image</Form.Label>
-                  <Form.Control value={values['collection-image']} onChange={handleChange} type="url" placeholder="(Optional) Enter Collection Image URL" />
+                  <InputGroup>
+                    <Form.Control value={values['collection-image']} onChange={handleChange} type="text" placeholder="(Optional) Enter Collection Image URL" />
+                      <InputGroup.Append>
+                      <Button variant="outline-secondary" onClick={() => this.askForFile()}>Select File</Button>
+                      <input type="file" ref={this.fileInput} onChange={evt => this.handleImageSelect(setFieldValue.bind(this, 'collection-image'), evt)} hidden/>
+                    </InputGroup.Append>
+                  </InputGroup>
                 </Form.Group>
                 <Button variant="primary" type="submit" disabled={isSubmitting}>
                   { isSubmitting ? `Processing (${this.state.stage}/${this.state.totalStage})` : 'Submit' }
