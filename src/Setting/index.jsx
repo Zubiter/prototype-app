@@ -1,4 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 
 import {
   Container,
@@ -73,6 +75,7 @@ export default function Setting() {
     'collection-external-link': '',
   });
   const [ showRenounceModal, setShowRenounceModal ] = useState(false);
+  const [ generatingZip, setGeneratingZip ] = useState(false);
   const contract = ctx.contracts.ZubiterClonableERC721.attach(collection.address);
   useEffect(() => {
     let unmount = false;
@@ -162,13 +165,42 @@ export default function Setting() {
     });
   }
 
+  async function buildZip () {
+    setGeneratingZip(true);
+    const zip = new JSZip();
+    zip.file('_headers', `\
+/:placeholder
+  Content-Type: application/json`);
+    (new Promise(res => {
+      fs.readdir(`/${collection.address}`, (err, files) => {
+        if (err) throw err;
+        res(Promise.all(files.map(file => {
+          return new Promise(res_ => {
+            fs.readFile(`/${collection.address}/${file}`, (err, content) => {
+              if (err) throw err;
+              zip.file(file, content);
+              res_(true);
+            });
+          });
+        })));
+      });
+    }))
+    .then(() => zip.generateAsync({type: 'blob'}))
+    .then(content => saveAs(content, `${collection.name}.zip`))
+    .then(() => setGeneratingZip(false))
+    .catch(err => {
+      setGeneratingZip(false);
+      console.error(err);
+    });
+  }
+
   return (
     <Container className="setting">
       <h2>Setting</h2>
       {/* <p className="text-muted">If no NFT and data will be minted or updated in this collection, migrate it to IPFS and renounce ownership might be a good idea.</p> */}
       <h4>Export Files</h4>
-      <Button variant="primary" type="button">
-        Save as ZIP
+      <Button variant="primary" type="button" disabled={generatingZip} onClick={buildZip}>
+        { generatingZip ? 'Generating' : 'Save as ZIP' }
       </Button>
       <p className="small text-muted">If you use Netlify to serve files, you can upload the zip in <a href="https://app.netlify.com/" target="_blank" rel="noreferrer">App</a> &gt; Site &gt; Deploys.</p>
       {/*
