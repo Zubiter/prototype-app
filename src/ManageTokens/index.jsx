@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 
 import {
   Container,
@@ -89,6 +89,8 @@ function EditModal (props) {
     'token-youtube-url': '',
     'token-attributes': '',
   });
+  const imageFileInput = useRef(null);
+  const aniFileInput = useRef(null);
 
   useEffect(() => {
     let unmount = false;
@@ -146,8 +148,28 @@ function EditModal (props) {
       youtube_url: values['token-youtube-url'],
     }), err => {
       if (err) throw err;
-      props.onHide()
+      [...imageFileInput.current.files, ...aniFileInput.current.files].forEach(file => {
+        const fileReader = new FileReader();
+        fileReader.onloadend = () => {
+          fs.writeFile(`/${collection.address}/assets/${file.name}`, Buffer.from(fileReader.result), err => {
+            if (err) throw err;
+            props.onHide()
+          });
+        };
+        fileReader.readAsArrayBuffer(file);
+      });
     });
+  }
+
+  function askForFile(ref) {
+    ref.current.click();    
+  }
+
+  function handleImageSelect(setValue, event) {
+    if (event.target.files.length === 0) return;
+
+    const file = event.target.files[0];
+    setValue(`{base-uri}assets/${file.name}`);
   }
 
   return (
@@ -156,7 +178,7 @@ function EditModal (props) {
         'token-id': props.tokenId,
         ...form,
       }}>
-      {({values, handleSubmit, handleChange, isSubmitting}) =>
+      {({values, handleSubmit, handleChange, isSubmitting, setFieldValue}) =>
       (
         <Form onSubmit={handleSubmit}>
           <Modal.Header closeButton>
@@ -177,7 +199,13 @@ function EditModal (props) {
               </Form.Group>
               <Form.Group controlId="token-image">
                 <Form.Label>Token Image</Form.Label>
-                <Form.Control value={values['token-image']} onChange={handleChange} type="text" placeholder="Paste URL or Upload" required />
+                <InputGroup>
+                  <Form.Control value={values['token-image']} onChange={handleChange} type="text" placeholder="Paste URL or Upload" required />
+                  <InputGroup.Append>
+                    <Button variant="outline-secondary" onClick={() => askForFile(imageFileInput)}>Select File</Button>
+                    <input type="file" ref={imageFileInput} onChange={evt => handleImageSelect(setFieldValue.bind(this, 'token-image'), evt)} hidden/>
+                  </InputGroup.Append>
+                </InputGroup>
               </Form.Group>
               <Accordion>
                 <Accordion.Toggle as={Button} eventKey="0" className="mb-3 float-right" size="sm" variant="secondary">Advanced Fields</Accordion.Toggle>
@@ -194,7 +222,13 @@ function EditModal (props) {
                     </Form.Group>
                     <Form.Group controlId="token-animation">
                       <Form.Label>Token Animation</Form.Label>
-                      <Form.Control value={values['token-animation']} onChange={handleChange} type="text" placeholder="Paste URL" />
+                      <InputGroup>
+                        <Form.Control value={values['token-animation']} onChange={handleChange} type="text" placeholder="Paste URL" />
+                        <InputGroup.Append>
+                          <Button variant="outline-secondary" onClick={() => askForFile(aniFileInput)}>Select File</Button>
+                          <input type="file" ref={aniFileInput} onChange={evt => handleImageSelect(setFieldValue.bind(this, 'token-animation'), evt)} hidden/>
+                        </InputGroup.Append>
+                      </InputGroup>
                       <Form.Text className="text-muted">A URL to a multi-media attachment for the item.</Form.Text>
                     </Form.Group>
                     <Form.Group controlId="token-youtube-url">

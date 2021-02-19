@@ -202,7 +202,7 @@ export default function Setting() {
             fs.readFile(`/${collection.address}/${file}`, (err, content) => {
               if (err) throw err;
 
-              content = decoder.decode(content).replace('{base-uri}', baseURI);
+              content = decoder.decode(content).replace(/{base-uri}/g, baseURI);
               zip.file(file, content);
               res_(true);
             });

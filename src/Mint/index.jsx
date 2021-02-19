@@ -31,6 +31,8 @@ export default class Mint extends React.Component {
       contract: null,
     };
     this.formInjector = React.createRef();
+    this.imageFileInput = React.createRef(null);
+    this.aniFileInput = React.createRef(null);
   }
 
   async componentDidMount() {
@@ -89,7 +91,24 @@ export default class Mint extends React.Component {
       })
     ))();
 
-    Promise.all([mintOnChain, createFile]).then(() => {
+    const uploadAssets = Promise.all(
+      [...this.imageFileInput.current.files, ...this.aniFileInput.current.files].map(file => new Promise((res, rej) => {
+        const fileReader = new FileReader();
+        fileReader.onloadend = () => {
+          fs.writeFile(`/${collection.address}/assets/${file.name}`, Buffer.from(fileReader.result), err => {
+            if (err) return rej(false);
+            setCtx({ alerts: [...ctx.alerts, {
+              variant: 'danger',
+              content: 'Failed to upload file, error message: ' + err,
+            }]});
+            res(true);
+          });
+        };
+        fileReader.readAsArrayBuffer(file);
+      })
+    ));
+
+    Promise.all([mintOnChain, createFile, uploadAssets]).then(() => {
       setSubmitting(false);
       setCtx({ alerts: [...ctx.alerts, {
         variant: 'success',
@@ -120,6 +139,17 @@ export default class Mint extends React.Component {
       if (err) throw err;
       this.setFieldValue('token-id', Math.max(0, ...files.filter(e => !isNaN(e)).map(e => parseInt(e, 10))) + 1);
     });
+  }
+
+  askForFile(ref) {
+    ref.current.click();    
+  }
+
+  handleImageSelect(setValue, event) {
+    if (event.target.files.length === 0) return;
+
+    const file = event.target.files[0];
+    setValue(`{base-uri}assets/${file.name}`);
   }
 
   render () {
@@ -168,7 +198,13 @@ export default class Mint extends React.Component {
           </Form.Group>
           <Form.Group controlId="token-image">
             <Form.Label>Token Image</Form.Label>
-            <Form.Control value={values['token-image']} onChange={handleChange} type="text" placeholder="Paste URL or Upload" required />
+            <InputGroup>
+              <Form.Control value={values['token-image']} onChange={handleChange} type="text" placeholder="Paste URL or Upload" required />
+              <InputGroup.Append>
+                <Button variant="outline-secondary" onClick={() => this.askForFile(this.imageFileInput)}>Select File</Button>
+                <input type="file" ref={this.imageFileInput} onChange={evt => this.handleImageSelect(setFieldValue.bind(this, 'token-image'), evt)} hidden/>
+              </InputGroup.Append>
+            </InputGroup>
           </Form.Group>
           <Accordion>
             <Accordion.Toggle as={Button} eventKey="0" className="mb-3 float-right" size="sm" variant="secondary">Advanced Fields</Accordion.Toggle>
@@ -185,7 +221,13 @@ export default class Mint extends React.Component {
                 </Form.Group>
                 <Form.Group controlId="token-animation">
                   <Form.Label>Token Animation</Form.Label>
-                  <Form.Control value={values['token-animation']} onChange={handleChange} type="text" placeholder="Paste URL" />
+                  <InputGroup>
+                    <Form.Control value={values['token-animation']} onChange={handleChange} type="text" placeholder="Paste URL" />
+                    <InputGroup.Append>
+                      <Button variant="outline-secondary" onClick={() => this.askForFile(this.aniFileInput)}>Select File</Button>
+                      <input type="file" ref={this.aniFileInput} onChange={evt => this.handleImageSelect(setFieldValue.bind(this, 'token-animation'), evt)} hidden/>
+                    </InputGroup.Append>
+                  </InputGroup>
                   <Form.Text className="text-muted">A URL to a multi-media attachment for the item.</Form.Text>
                 </Form.Group>
                 <Form.Group controlId="token-youtube-url">
