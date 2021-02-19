@@ -21,12 +21,17 @@ export default class Create extends React.Component {
     super(props);
     this.state = {
       stage: 0,
+      totalStage: 2,
       finished: false
     };
   }
 
   submitForm(values, { setSubmitting }) {
+    this.setState({stage: 0, totalStage: 2});
     const { ctx, setCtx, setCollection } = this.context;
+    if (values['collection-base-uri']) {
+      this.setState({totalStage: 3});
+    }
 
     const createToken = ctx.contracts.Zubiter.createToken(values['collection-name'], values['collection-symbol'])
     .then(tx => 
@@ -39,10 +44,13 @@ export default class Create extends React.Component {
     createToken.then(token => setCtx({collections: [...ctx.collections, token]}));
     createToken.then(token => setCollection({address: token}));
 
-    const setBaseURI = createToken.then(token =>
-      ctx.contracts.ZubiterClonableERC721.attach(token).setBaseURI(values['collection-base-uri'])
-      .then(tx => tx.wait().then(() => this.setState(prev => Object.assign({}, { ...this.state, stage: prev.stage + 1 }))))
-    );
+    const setBaseURI = values['collection-base-uri'] ?
+      createToken.then(token =>
+        ctx.contracts.ZubiterClonableERC721.attach(token).setBaseURI(values['collection-base-uri'])
+        .then(tx => tx.wait())
+        .then(() => this.setState(prev => Object.assign({}, { ...this.state, stage: prev.stage + 1 })))
+      )
+      : 0;
 
     const createFile = createToken.then(token => new Promise((res, rej) => {
       fs.mkdir(`/${token}`, err => {
@@ -111,7 +119,7 @@ export default class Create extends React.Component {
             initialValues={{
               'collection-name': '',
               'collection-symbol': '',
-              'collection-base-uri': 'https://',
+              'collection-base-uri': '',
               'collection-description': '',
               'collection-image': '',
               'collection-external-link': '',
@@ -129,8 +137,8 @@ export default class Create extends React.Component {
                 </Form.Group>
                 <Form.Group controlId="collection-base-uri">
                   <Form.Label>Collection Base URI</Form.Label>
-                  <Form.Control value={values['collection-base-uri']} onChange={handleChange} type="url" placeholder="https://" required />
-                  <Form.Text className="text-muted">You can use <a href="https://netlify.com" target="_blank" rel="noreferrer">Netlify</a>.</Form.Text>
+                  <Form.Control value={values['collection-base-uri']} onChange={handleChange} type="url" placeholder="https://" />
+                  <Form.Text className="text-muted">Leave it blank if you don't have it now. <a href="https://netlify.com" target="_blank" rel="noreferrer">Netlify</a> is recommended.</Form.Text>
                 </Form.Group>
                 <Form.Group controlId="collection-description">
                   <Form.Label>Collection Description</Form.Label>
@@ -145,7 +153,7 @@ export default class Create extends React.Component {
                   <Form.Control value={values['collection-image']} onChange={handleChange} type="url" placeholder="(Optional) Enter Collection Image URL" />
                 </Form.Group>
                 <Button variant="primary" type="submit" disabled={isSubmitting}>
-                  { isSubmitting ? `Processing (${this.state.stage}/3)` : 'Submit' }
+                  { isSubmitting ? `Processing (${this.state.stage}/${this.state.totalStage})` : 'Submit' }
                 </Button>
               </Form>
             )}
