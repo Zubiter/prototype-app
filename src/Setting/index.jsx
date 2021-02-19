@@ -5,6 +5,7 @@ import {
   Form,
   Button,
   Row,
+  Modal,
 } from 'react-bootstrap';
 import { Formik } from 'formik';
 
@@ -14,8 +15,56 @@ import AppContext from '../context';
 
 import './Setting.css';
 
-export default function Setting() {
+function RenounceModal(props) {
   const { ctx, collection, setCtx } = useContext(AppContext);
+  const [ waiting, setWaiting ] = useState(false);
+  const contract = ctx.contracts.ZubiterClonableERC721.attach(collection.address);
+
+  function sendRenounceTx () {
+    setWaiting(true);
+    return contract.renounceOwnership()
+    .then(tx => tx.wait())
+    .then(() => {
+      setCtx({ alerts: [...ctx.alerts, {
+        variant: 'success',
+        content: 'Renounce collection succeed.',
+      }]});
+      setWaiting(false);
+      props.onHide();
+    })
+    .catch(err => {
+      setCtx({ alerts: [...ctx.alerts, {
+        variant: 'danger',
+        content: 'Failed to renounce collection, error message: ' + err.message,
+      }]});
+      setWaiting(false);
+      props.onHide();
+    });
+  }
+
+  return (
+  <Modal show={props.show} onHide={props.onHide}>
+    <Modal.Header closeButton>
+      <Modal.Title>Renounce Ownership</Modal.Title>
+    </Modal.Header>
+    <Modal.Body>
+      <b>You will be unable to mint and update base url for this collection, check and think before you doing this.</b>
+      <p>Target collection:<br/><b>{collection.name}</b> ({collection.address})</p>
+    </Modal.Body>
+    <Modal.Footer>
+      <Button variant="secondary" onClick={props.onHide}>
+        Close
+      </Button>
+      <Button variant="danger" onClick={sendRenounceTx} disabled={waiting}>
+        { waiting ? 'Processing' : 'Renounce Ownership' }
+      </Button>
+    </Modal.Footer>
+  </Modal>
+  );
+}
+
+export default function Setting() {
+  const { ctx, collection, setCtx, setCollection } = useContext(AppContext);
   const [ form, setForm ] = useState({
     'collection-name': '',
     'collection-base-uri': 'https://',
@@ -23,6 +72,7 @@ export default function Setting() {
     'collection-image': '',
     'collection-external-link': '',
   });
+  const [ showRenounceModal, setShowRenounceModal ] = useState(false);
   const contract = ctx.contracts.ZubiterClonableERC721.attach(collection.address);
   useEffect(() => {
     let unmount = false;
@@ -36,13 +86,16 @@ export default function Setting() {
         data = {};
       }
 
-      if (!unmount) setForm(prev => ({
+      if (unmount) return;
+
+      setForm(prev => ({
         ...prev,
         'collection-name': data.name || '',
         'collection-description': data.description || '',
         'collection-image': data.image || '',
         'collection-external-link': data.external_link || '',
       }));
+      setCollection({name: data.name});
     });
     contract.baseURI().then(uri => {
       if (!unmount) setForm(prev => ({...prev, 'collection-base-uri': uri}));
@@ -78,7 +131,6 @@ export default function Setting() {
           });
         }
 
-        localStorage.setItem(`collection-${collection.address}`, values['collection-name']);
         fs.writeFile(`/${collection.address}/collection`, JSON.stringify({
           name: values['collection-name'],
           description: values['collection-description'],
@@ -185,7 +237,7 @@ export default function Setting() {
       <Container className="p-0">
         <h4>Danger Zone</h4>
         <Row className="m-0">
-          <Button variant="danger" type="button">
+          <Button variant="danger" type="button" onClick={() => setShowRenounceModal(true)}>
             Renounce Collection
           </Button>&nbsp;
           {/* <Button variant="outline-danger" type="button">
@@ -193,6 +245,7 @@ export default function Setting() {
           </Button> */}
         </Row>
       </Container>
+      <RenounceModal show={showRenounceModal} onHide={() => setShowRenounceModal(false)} />
     </Container>
   );
 }
