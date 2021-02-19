@@ -123,9 +123,16 @@ export default class Panel extends React.Component {
         <Row>
           <Col md="2" className="d-none d-lg-block shadow sidenav sticky-top px-1">
             <Nav className="flex-column pt-2" variant="pills">
-              <NavDropdown title={collection.address || 'Select Collection'}>
+              <NavDropdown
+                title={collection.address ? 
+                  window.localStorage.getItem(`collection-${collection.address}`) || collection.address
+                  : 'Select Collection'
+                }
+              >
                 {ctx.collections.map((addr, idx) => 
-                  <NavDropdown.Item key={idx} onClick={this.switchCollection.bind(this, addr)}>{addr}</NavDropdown.Item>
+                  <NavDropdown.Item key={idx} onClick={this.switchCollection.bind(this, addr)}>{
+                    window.localStorage.getItem(`collection-${addr}`) || addr  
+                  }</NavDropdown.Item>
                 )}
                 <NavDropdown.Divider />
                 <LinkContainer to="/create">
