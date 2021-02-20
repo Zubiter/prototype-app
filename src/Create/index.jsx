@@ -45,7 +45,7 @@ export default class Create extends React.Component {
     );
 
     createToken.then(token => setCtx({collections: [...ctx.collections, token]}));
-    createToken.then(token => setCollection({address: token}));
+    createToken.then(token => setCollection({address: token, transferred: false}));
 
     const setBaseURI = values['collection-base-uri'] ?
       createToken.then(token =>

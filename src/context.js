@@ -27,6 +27,7 @@ export class ContextProvider extends React.Component {
             name: null,
             symbol: null,
             address: null,
+            transferred: null,
             tokensById: {}, // id => token meta
             tokens: [], // array<num>
             events: [], // transfer events

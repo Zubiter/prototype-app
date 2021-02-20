@@ -70,7 +70,7 @@ function Token (props) {
               <Button variant="outline-secondary" onClick={() => sendMintTx(mintTo)}>Mint</Button>
             </InputGroup.Append>
           </InputGroup>
-          : <Button variant="primary" onClick={() => setMinting(true)}>Mint</Button>
+          : <Button variant="primary" onClick={() => setMinting(true)} disabled={collection.transferred}>Mint</Button>
       )}</td>
       <td><Button variant="primary" onClick={() => props.showEditModal(props.tokenId)}>Edit</Button></td>
     </tr>
@@ -288,9 +288,11 @@ export default class ManageTokens extends React.Component {
   }
 
   render () {
+    const { collection } = this.context;
     return (
       <Container className="manage-tokens">
         <h2>Manage Tokens</h2>
+        { collection.transferred ? <p>Collection already has been transferred ownership, mint token on chain is disabled.</p> : ''}
         <Row>
           <Col xs="12" className="mt-2">
             <Card>

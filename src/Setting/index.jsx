@@ -19,7 +19,7 @@ import AppContext from '../context';
 import './Setting.css';
 
 function RenounceModal(props) {
-  const { ctx, collection, setCtx } = useContext(AppContext);
+  const { ctx, collection, setCtx, setCollection } = useContext(AppContext);
   const [ waiting, setWaiting ] = useState(false);
   const contract = ctx.contracts.ZubiterClonableERC721.attach(collection.address);
 
@@ -32,6 +32,7 @@ function RenounceModal(props) {
         variant: 'success',
         content: 'Renounce collection succeed.',
       }]});
+      setCollection({ transferred: true });
       setWaiting(false);
       props.onHide();
     })
@@ -280,7 +281,7 @@ export default function Setting() {
             </Form.Group>
             <Form.Group controlId="collection-base-uri">
               <Form.Label>Collection Base URI</Form.Label>
-              <Form.Control value={values['collection-base-uri']} onChange={handleChange} type="url" placeholder="https://" />
+              <Form.Control value={values['collection-base-uri']} onChange={handleChange} type="url" placeholder="https://" disabled={collection.transferred} />
               <Form.Text className="text-muted">You can use <a href="https://netlify.com" target="_blank" rel="noreferrer">Netlify</a>.</Form.Text>
             </Form.Group>
             <Form.Group controlId="collection-description">

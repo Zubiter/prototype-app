@@ -34,7 +34,7 @@ export default class Panel extends React.Component {
   static contextType = AppContext;
 
   connectToWallet () {
-    const { ctx, setCtx, setCollection } = this.context;
+    const { ctx, setCtx } = this.context;
 
     ctx.ethers.provider.send('eth_requestAccounts')
     .then(async addrs => {
@@ -53,9 +53,9 @@ export default class Panel extends React.Component {
         },
         contracts,
         collections: ownCollections,
-      })
+      });
 
-      setCollection({address: ownCollections[0]})
+      if (ownCollections.length) this.switchCollection(ownCollections[0]);
     })
     .catch(err => {
       setCtx({ alerts: [...ctx.alerts, {
@@ -72,8 +72,12 @@ export default class Panel extends React.Component {
   }
 
   switchCollection(addr) {
-    const { setCollection } = this.context;
-    setCollection({ address: addr });
+    const { ctx, setCollection } = this.context;
+    const collectionContract = ctx.contracts.ZubiterClonableERC721.attach(addr);
+    collectionContract.owner().then(addr => {
+      if (addr.toLowerCase() === ctx.address.toLowerCase()) setCollection({ transferred: false });
+    });
+    setCollection({ address: addr, transferred: true });
   }
 
   render () {
@@ -100,9 +104,11 @@ export default class Panel extends React.Component {
               <LinkContainer exact to={`/dashboard`}>
                 <Nav.Link><AiOutlineDashboard />Dashboard</Nav.Link>
               </LinkContainer>
-              <LinkContainer to={`/mint`}>
-                <Nav.Link><AiOutlineDollarCircle />Mint</Nav.Link>
-              </LinkContainer>
+              { collection.transferred ? '' : 
+                <LinkContainer to={`/mint`}>
+                  <Nav.Link><AiOutlineDollarCircle />Mint</Nav.Link>
+                </LinkContainer>
+              }
               <LinkContainer to={`/manage-tokens`}>
                 <Nav.Link><BsCollection />Manage Tokens</Nav.Link>
               </LinkContainer>
@@ -148,9 +154,11 @@ export default class Panel extends React.Component {
               <LinkContainer exact to={`/dashboard`}>
                 <Nav.Link><AiOutlineDashboard />Dashboard</Nav.Link>
               </LinkContainer>
-              <LinkContainer to={`/mint`}>
-                <Nav.Link><AiOutlineDollarCircle />Mint</Nav.Link>
-              </LinkContainer>
+              { collection.transferred ? '' : 
+                <LinkContainer to={`/mint`}>
+                  <Nav.Link><AiOutlineDollarCircle />Mint</Nav.Link>
+                </LinkContainer>
+              }
               <LinkContainer to={`/manage-tokens`}>
                 <Nav.Link><BsCollection />Manage Tokens</Nav.Link>
               </LinkContainer>

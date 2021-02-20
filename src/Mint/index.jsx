@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
 import {
   Container,
@@ -8,6 +8,7 @@ import {
   Accordion,
 } from 'react-bootstrap';
 import { Formik } from 'formik';
+import { Redirect } from 'react-router-dom';
 
 import AppContext from '../context';
 
@@ -18,6 +19,15 @@ import './Mint.css';
 // FIXME: Temp Hack for create ref
 class FormInjector extends React.Component {
   render() { return <></>; }
+}
+
+function Transferred () {
+  const { ctx, setCtx } = useContext(AppContext);
+  setCtx({ alerts: [...ctx.alerts, {
+    variant: 'danger',
+    content: 'Collection already has been transferred ownership, mint token is disabled.',
+  }]})
+  return <Redirect to="/dashboard" />;
 }
 export default class Mint extends React.Component {
   static contextType = AppContext;
@@ -153,9 +163,12 @@ export default class Mint extends React.Component {
   }
 
   render () {
-    const { ctx } = this.context;
+    const { ctx, collection } = this.context;
     return (
       <Container className="mint">
+        { collection.transferred ? 
+          <Transferred />
+          : ''}
         <h2>Mint</h2>
         <p className="text-muted">Metadata is expected to be immutable after minted, but you still can update them later. Files uploaded will be stored to Netlify site.</p>
         <Formik onSubmit={this.submitForm.bind(this)} enableReinitialize initialValues={{
