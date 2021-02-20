@@ -106,11 +106,13 @@ export default class Mint extends React.Component {
         const fileReader = new FileReader();
         fileReader.onloadend = () => {
           fs.writeFile(`/${collection.address}/assets/${file.name}`, Buffer.from(fileReader.result), err => {
-            if (err) return rej(false);
-            setCtx({ alerts: [...ctx.alerts, {
-              variant: 'danger',
-              content: 'Failed to upload file, error message: ' + err,
-            }]});
+            if (err) {
+              rej(false);
+              return setCtx({ alerts: [...ctx.alerts, {
+                variant: 'danger',
+                content: 'Failed to upload file, error message: ' + err,
+              }]});
+            }
             res(true);
           });
         };
