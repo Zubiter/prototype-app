@@ -191,16 +191,16 @@ function EditModal (props) {
               </Form.Group>
               <Form.Group controlId="token-name">
                 <Form.Label>Token Name</Form.Label>
-                <Form.Control value={values['token-name']} onChange={handleChange} type="text" placeholder="An Awesome Cat" required />
+                <Form.Control value={values['token-name']} onChange={handleChange} type="text" placeholder="An Awesome Cat" />
               </Form.Group>
               <Form.Group controlId="token-description">
                 <Form.Label>Token Description</Form.Label>
-                <Form.Control value={values['token-description']} onChange={handleChange} as="textarea" placeholder="A cat with colorful fur." required />
+                <Form.Control value={values['token-description']} onChange={handleChange} as="textarea" placeholder="A cat with colorful fur." />
               </Form.Group>
               <Form.Group controlId="token-image">
                 <Form.Label>Token Image</Form.Label>
                 <InputGroup>
-                  <Form.Control value={values['token-image']} onChange={handleChange} type="text" placeholder="Paste URL or Upload" required />
+                  <Form.Control value={values['token-image']} onChange={handleChange} type="text" placeholder="Paste URL or Upload" />
                   <InputGroup.Append>
                     <Button variant="outline-secondary" onClick={() => askForFile(imageFileInput)}>Select File</Button>
                     <input type="file" ref={imageFileInput} onChange={evt => handleImageSelect(setFieldValue.bind(this, 'token-image'), evt)} hidden/>

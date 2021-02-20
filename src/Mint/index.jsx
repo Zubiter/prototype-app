@@ -170,7 +170,7 @@ export default class Mint extends React.Component {
           <Transferred />
           : ''}
         <h2>Mint</h2>
-        <p className="text-muted">Metadata is expected to be immutable after minted, but you still can update them later. Files uploaded will be stored to Netlify site.</p>
+        <p className="text-muted">Metadata is expected to be immutable after minted to someone, but you still can update them in Manage Tokens. Files uploaded will be stored in your browser and can be export in Setting.</p>
         <Formik onSubmit={this.submitForm.bind(this)} enableReinitialize initialValues={{
           'token-id': 1,
           'mint-to': '',
@@ -203,16 +203,16 @@ export default class Mint extends React.Component {
           </Form.Group>
           <Form.Group controlId="token-name">
             <Form.Label>Token Name</Form.Label>
-            <Form.Control value={values['token-name']} onChange={handleChange} type="text" placeholder="An Awesome Cat" required />
+            <Form.Control value={values['token-name']} onChange={handleChange} type="text" placeholder="An Awesome Cat" />
           </Form.Group>
           <Form.Group controlId="token-description">
             <Form.Label>Token Description</Form.Label>
-            <Form.Control value={values['token-description']} onChange={handleChange} as="textarea" placeholder="A cat with colorful fur." required />
+            <Form.Control value={values['token-description']} onChange={handleChange} as="textarea" placeholder="A cat with colorful fur." />
           </Form.Group>
           <Form.Group controlId="token-image">
             <Form.Label>Token Image</Form.Label>
             <InputGroup>
-              <Form.Control value={values['token-image']} onChange={handleChange} type="text" placeholder="Paste URL or Upload" required />
+              <Form.Control value={values['token-image']} onChange={handleChange} type="text" placeholder="Paste URL or Upload" />
               <InputGroup.Append>
                 <Button variant="outline-secondary" onClick={() => this.askForFile(this.imageFileInput)}>Select File</Button>
                 <input type="file" ref={this.imageFileInput} onChange={evt => this.handleImageSelect(setFieldValue.bind(this, 'token-image'), evt)} hidden/>

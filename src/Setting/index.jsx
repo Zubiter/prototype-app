@@ -192,6 +192,11 @@ export default function Setting() {
     zip.file('_headers', `\
 /:placeholder
   Content-Type: application/json`);
+    zip.file('README.md', `\
+# Zubiter Collection Export
+This zip is export with [Zubiter](https://zubiter-app.limaois.me). You can upload it to Netlify directly.  
+If you are hosting it by yourself, it's recommended keep the file structure, and serve /* (not including /assets/*) with header \`Content-Type: application/json\`.  
+Find out instruction on [Zubiter wiki](https://github.com/flyinglimao/zubiter-app/wiki/how-to-upload-to-netlify) `)
     (new Promise(res => {
       // export root files
       fs.readdir(`/${collection.address}`, (err, files) => {
