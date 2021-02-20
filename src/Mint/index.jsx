@@ -71,10 +71,9 @@ export default class Mint extends React.Component {
     if (values['mint-to'] !== '') { 
       this.setState({totalStage: 2});
       mintOnChain = this.state.contract['mint(address,uint256)'](values['mint-to'], values['token-id'])
-      .then(tx => {
-        tx.wait().then(() => {
-          this.setState(prev => ({ ...this.state, stage: prev.stage + 1 }))
-        });
+      .then(tx => tx.wait())
+      .then(() => {
+        this.setState(prev => ({ ...this.state, stage: prev.stage + 1 }))
       })
       .catch(err => {
         setCtx({ alerts: [...ctx.alerts, {
