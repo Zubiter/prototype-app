@@ -19,6 +19,7 @@ import {
   AiOutlineDollarCircle,
   AiOutlineDashboard,
   AiOutlineSetting,
+  AiFillGithub,
 } from 'react-icons/ai';
 
 import AppContext from './context';
@@ -165,6 +166,8 @@ export default class Panel extends React.Component {
               <LinkContainer to={`/setting`}>
                 <Nav.Link><AiOutlineSetting />Setting</Nav.Link>
               </LinkContainer>
+              <div className="divider" />
+              <Nav.Link href="https://github.com/flyinglimao/zubiter-app" target="_blnak" rel="noreferrer" active={false}><AiFillGithub />GitHub</Nav.Link>
               {/* <LinkContainer to="/1/extensions">
                 <Nav.Link><BsPuzzle />Extensions</Nav.Link>
               </LinkContainer>
