@@ -4,6 +4,15 @@ Create NFT collection and manage it without coding.
 ![Screenshot](./screenshot.png)
 
 Associated Repo for contracts used: https://github.com/flyinglimao/zubiter-contract
+
+## Contracts
+### Binance Testnet
+Zubiter Main: 0x208934f52B250705170Dda55baCD5Bc7Be71d8c2
+Zubiter ClonableERC721: 0xC9446eE71249c30E4B3fD398E6D6Eb5d813552ED
+
+### Binance Mainnet
+Zubiter Main: 0x455B3e98cC41419C64CcDc7d852B0e2191a66134
+Zubiter ClonableERC721: 0x33fe79A5c3c69c87BFE734fad3A44855def27B01
 ## Develop
 This project used [Create React App](https://github.com/facebook/create-react-app).  
 
