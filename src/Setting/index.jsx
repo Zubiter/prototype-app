@@ -191,7 +191,8 @@ export default function Setting() {
     const zip = new JSZip();
     zip.file('_headers', `\
 /:placeholder
-  Content-Type: application/json`);
+  Content-Type: application/json
+  Access-Control-Allow-Origin: *`);
     zip.file('README.md', `\
 # Zubiter Collection Export
 This zip is export with [Zubiter](https://zubiter-app.limaois.me). You can upload it to Netlify directly.  
