@@ -30,6 +30,7 @@ import './Panel.css';
 const networkMap = {
   42: 'kovan',
   97: 'binance-test',
+  56: 'binance-main',
 }
 export default class Panel extends React.Component {
   static contextType = AppContext;

@@ -1,5 +1,6 @@
 {
     "address": {
+        "binance-main": "0x455B3e98cC41419C64CcDc7d852B0e2191a66134",
         "binance-test": "0x208934f52B250705170Dda55baCD5Bc7Be71d8c2",
         "kovan": "0x455B3e98cC41419C64CcDc7d852B0e2191a66134"
     },
