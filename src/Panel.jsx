@@ -32,6 +32,11 @@ const networkMap = {
   97: 'binance-test',
   56: 'binance-main',
 }
+const deployAtBlock = {
+  42: 23514290,
+  97: 6302977,
+  56: 5049701,
+}
 export default class Panel extends React.Component {
   static contextType = AppContext;
 
@@ -40,12 +45,13 @@ export default class Panel extends React.Component {
 
     ctx.ethers.provider.send('eth_requestAccounts')
     .then(async addrs => {
-      const network = networkMap[(await ctx.ethers.provider.getNetwork()).chainId];
+      const networkId = (await ctx.ethers.provider.getNetwork()).chainId;
+      const network = networkMap[networkId];
       const signer = ctx.ethers.provider.getSigner(addrs[0]);
       const contracts = Contract.initContracts({signer}, network);
+      const latestBlock = await ctx.ethers.provider.getBlockNumber();
 
-      const ownCollectionsFilter = contracts.Zubiter.filters.CreateToken(addrs[0]);
-      const ownCollections = (await contracts.Zubiter.queryFilter(ownCollectionsFilter)).map(evt => evt.args.token);
+      const ownCollections = await this.getOwnCollections(contracts, addrs, networkId, latestBlock);
 
       setCtx({
         address: addrs[0],
@@ -66,6 +72,33 @@ export default class Panel extends React.Component {
       }]})
       console.error(err)
     })
+  }
+
+  async getOwnCollections(contracts, addrs, networkId, latestBlock) {
+      const ownCollectionsFilter = contracts.Zubiter.filters.CreateToken(addrs[0]);
+      const requestCollection = [];
+      const { startFrom, cachedCollection } =
+        localStorage.getItem(`cache-collection-${networkId}-${addrs[0]}`) ?
+          JSON.parse(localStorage.getItem(`cache-collection-${networkId}-${addrs[0]}`)) : 
+          {
+            startFrom: deployAtBlock[networkId],
+            cachedCollection: [],
+          };
+      for (let i  = startFrom; i < latestBlock; i += 5000) {
+        requestCollection.push(
+          contracts.Zubiter.queryFilter(ownCollectionsFilter, i, i+5000)
+        );
+      }
+
+      const collections = [...cachedCollection, ...await Promise.all(requestCollection)
+      .then(requests =>
+        requests.reduce((prev, current) => [...prev, ...current.map(evt => evt.args.token)], [])
+      )]
+      localStorage.setItem(`cache-collection-${networkId}-${addrs[0]}`, JSON.stringify({
+        startFrom: latestBlock,
+        cachedCollection: collections,
+      }));
+      return collections;
   }
 
   closeAlert (key) {
